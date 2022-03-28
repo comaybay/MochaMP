@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<HBox prefHeight="540" prefWidth="960" style="-fx-background-color: transparent;" stylesheets="@../../../style.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.mochamp.controllers.MainController">
+   <children>
+      <Pane fx:id="player" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="275.0" prefWidth="300.0" styleClass="panel">
+         <children>
+            <HBox alignment="CENTER_RIGHT" layoutY="10.0" prefHeight="0.0" prefWidth="300.0">
+               <children>
+                  <ImageView fx:id="minimizeButton" fitHeight="16.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../minimize.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="closeButton"  fitHeight="16.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../close.png" />
+                     </image>
+                     <HBox.margin>
+                        <Insets left="15.0" />
+                     </HBox.margin>
+                  </ImageView>
+               </children>
+               <padding>
+                  <Insets left="11.0" right="11.0" />
+               </padding></HBox>
+            <VBox alignment="TOP_CENTER" layoutX="2.0" layoutY="28.0" prefHeight="250.0" prefWidth="300.0">
+               <children>
+                  <ImageView fx:id="thumbnail" fitHeight="125.0" fitWidth="125.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../author.png" />
+                     </image>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </ImageView>
+                  <Label text="Cá Hồi Hoang - Đến Bao Giờ (Audio)" textFill="WHITE">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets bottom="5.0" top="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <HBox prefHeight="0.0" prefWidth="260.0">
+                     <children>
+                        <Label text="0:00" textFill="WHITE">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Slider HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets left="5.0" right="5.0" top="3.0" />
+                           </HBox.margin>
+                        </Slider>
+                        <Label text="4:01" textFill="WHITE">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children></HBox>
+                  <HBox alignment="CENTER" prefHeight="64.0" prefWidth="260.0">
+                     <children>
+                        <StackPane fx:id="prevSong" prefHeight="27.0" prefWidth="21.0">
+                           <children>
+                              <Circle fill="WHITE" radius="22.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 20, 0, 0, 0); -fx-background-radius: 100;" />
+                              <ImageView fx:id="prevSongImage" fitHeight="20.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../prev-song.png" />
+                                 </image>
+                              </ImageView>
+                           </children>
+                        </StackPane>
+                        <StackPane fx:id="startStop" prefHeight="0.0" prefWidth="50.0">
+                           <children>
+                              <Circle fill="WHITE" radius="25.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 30, 0, 0, 0); -fx-background-radius: 100;" />
+                              <ImageView fx:id="startStopImage" fitHeight="24.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../play.png" />
+                                 </image>
+                              </ImageView>
+                           </children>
+                           <HBox.margin>
+                              <Insets left="12.0" right="12.0" />
+                           </HBox.margin>
+                        </StackPane>
+                        <StackPane fx:id="nextSong" prefHeight="27.0" prefWidth="21.0">
+                           <children>
+                              <Circle fill="WHITE" radius="22.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 20, 0, 0, 0); -fx-background-radius: 100;" />
+                              <ImageView fx:id="nextSongImage" fitHeight="20.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../next-song.png" />
+                                 </image>
+                              </ImageView>
+                           </children>
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </StackPane>
+                     </children>
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" />
+               </padding></VBox>
+         </children></Pane>
+      <Pane fx:id="playlist" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="275.0" prefWidth="600.0" styleClass="panel">
+         <HBox.margin>
+            <Insets left="5.0" />
+         </HBox.margin></Pane>
+   </children>
+</HBox>
