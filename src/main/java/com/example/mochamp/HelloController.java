@@ -1,9 +1,11 @@
 package com.example.mochamp;
 
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -79,8 +81,35 @@ public class HelloController implements Initializable {
         pane.setLayoutX(0);
         pane.setLayoutY(54*i);
         pane.getChildren().addAll(btn_play,sing,song,btn_dot);
-
         vbox.getChildren().add(pane);
+        Border  appmntBorder = new Border(new BorderStroke(Color.DARKORCHID,
+                Color.DARKORCHID,
+                Color.DARKORCHID,
+                Color.DARKORCHID,
+                BorderStrokeStyle.SOLID,
+                BorderStrokeStyle.SOLID,
+                BorderStrokeStyle.SOLID,
+                BorderStrokeStyle.SOLID,
+                new CornerRadii(10), BorderWidths.DEFAULT,
+                new Insets(1)));
+        pane.setOnMouseClicked(
+                new EventHandler() {
+
+                    @Override
+                    public void handle(Event event) {
+                        pane.setBorder(appmntBorder);
+                        Image img = new Image("file:/"+System.getProperty("user.dir").replace("\\", "/")+"/src/main/image/2x/outline_pause_circle_filled_white_18dp.png");
+                        BackgroundImage bgImage = new BackgroundImage(img, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+                                BackgroundSize.DEFAULT);
+                        Background bg = new Background(bgImage);
+                        Button btn_play = new Button();
+                        btn_play.setPrefSize(35,35);
+                        btn_play.setLayoutX(15);
+                        btn_play.setLayoutY(15);
+                        btn_play.setBackground(bg);
+                        pane.getChildren().setAll(btn_play,sing,song,btn_dot);
+                    }
+                });
     }
     public void onHelloButtonClick(ActionEvent actionEvent) {
         if(!menu.isVisible()){
