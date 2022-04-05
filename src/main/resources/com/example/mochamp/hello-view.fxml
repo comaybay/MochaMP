@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.paint.*?>
+<?import java.lang.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="parent" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="800.0" spacing="20.0" styleClass="parent" stylesheets="@../../../../css/style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.mochamp.HelloController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+    <children>
+        <Pane fx:id="menu" layoutX="100.0" layoutY="100.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="300.0" style="-fx-background-radius: 30;" styleClass="BlueViolet" translateX="150.0" translateY="160.0" VBox.vgrow="NEVER">
+            <VBox.margin>
+                <Insets bottom="-0.0" />
+            </VBox.margin>
+            <children>
+                <Label alignment="CENTER" layoutX="26.0" layoutY="27.0" text="Main" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="24.0" />
+                    </font>
+                </Label>
+                <Label layoutX="80.0" layoutY="71.0" text="Album Style" textFill="WHITE">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Label>
+                <Label layoutX="80.0" layoutY="123.0" text="Singer Style" textFill="WHITE">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Label>
+                <Label layoutX="80.0" layoutY="228.0" text="Lyrics Style" textFill="WHITE">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Label>
+                <Label alignment="CENTER" layoutX="26.0" layoutY="193.0" text="Toggle Control" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="24.0" />
+                    </font>
+                </Label>
+                <Line endX="100.0" layoutX="152.0" layoutY="176.0" startX="-100.0" stroke="WHITE" />
+                <CheckBox layoutX="234.0" layoutY="71.0" mnemonicParsing="false" />
+                <CheckBox layoutX="234.0" layoutY="123.0" mnemonicParsing="false" />
+                <CheckBox layoutX="234.0" layoutY="228.0" mnemonicParsing="false" />
+            </children>
+        </Pane>
+        <Pane fx:id="slidebar" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="300.0" style="-fx-background-radius: 15;" styleClass="BlueViolet" translateX="-200.0" translateY="-160.0" VBox.vgrow="NEVER">
+            <VBox.margin>
+                <Insets />
+            </VBox.margin>
+            <children>
+            <VBox fx:id="vbox" layoutX="6.0" layoutY="156.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onScroll="#onScroll" prefWidth="288.0" />
+            <Pane prefHeight="160.0" prefWidth="300.0" style="-fx-background-radius: 15;" styleClass="BlueViolet">
+               <children>
+                      <Button layoutX="22.0" layoutY="49.0" onAction="#onHelloButtonClick" prefHeight="31.0" prefWidth="35.0" styleClass="Menu" />
+                      <Button layoutX="244.0" layoutY="49.0" mnemonicParsing="false" onAction="#onFindClick" prefHeight="31.0" prefWidth="35.0" styleClass="Find" />
+                      <Label fx:id="text" alignment="CENTER" layoutX="54.0" layoutY="89.0" prefHeight="35.0" prefWidth="201.0" text="Rockstart" textFill="WHITE">
+                          <font>
+                              <Font name="System Bold" size="24.0" />
+                          </font>
+                      </Label>
+                  <Label alignment="CENTER" layoutX="54.0" layoutY="122.0" prefHeight="21.0" prefWidth="201.0" text="A.R Rahaman" textFill="WHITE" />
+               </children>
+            </Pane>
+            <Pane layoutY="675.0" prefHeight="25.0" prefWidth="300.0" style="-fx-background-radius: 15;" styleClass="BlueViolet" />
+            </children>
+        </Pane>
+    </children>
+</VBox>
