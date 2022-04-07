@@ -9,7 +9,7 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<HBox prefHeight="540" prefWidth="960" spacing="20" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.mochamp.controllers.MainController">
+<HBox fx:id="root" prefHeight="540" prefWidth="960" spacing="20" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.mochamp.controllers.MainController">
    <children>
       <Pane fx:id="player" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="275.0" prefWidth="300.0" styleClass="panel">
          <children>
@@ -42,7 +42,7 @@
                         <Insets />
                      </VBox.margin>
                   </ImageView>
-                  <Label text="Cá Hồi Hoang - Đến Bao Giờ (Audio)" textFill="WHITE">
+                  <Label fx:id="songTitle" text="Cá Hồi Hoang - Đến Bao Giờ (Audio)" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
@@ -52,17 +52,17 @@
                   </Label>
                   <HBox prefHeight="0.0" prefWidth="260.0">
                      <children>
-                        <Label text="0:00" textFill="WHITE">
+                        <Label fx:id="songCurrentTime" text="0:00" textFill="WHITE">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <Slider HBox.hgrow="ALWAYS">
+                        <Slider fx:id="progressBar" HBox.hgrow="ALWAYS">
                            <HBox.margin>
                               <Insets left="5.0" right="5.0" top="3.0" />
                            </HBox.margin>
                         </Slider>
-                        <Label text="4:01" textFill="WHITE">
+                        <Label fx:id="songDuration" text="4:01" textFill="WHITE">
                            <font>
                               <Font size="14.0" />
                            </font>

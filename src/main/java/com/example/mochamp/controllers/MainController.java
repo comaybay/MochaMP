@@ -10,22 +10,36 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.net.URL;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MainController {
+    public HBox root;
+
+    public List<File> musicFiles;
+    public Media media;
+    public MediaPlayer mediaPlayer;
+    public Timer timer;
     //head player
+    public Label songTitle;
+    public Label songDuration;
+    public Label songCurrentTime;
     public ImageView thumbnail;
-    public ProgressBar progressBar;
+    public Slider progressBar;
     public StackPane startStop;
     public ImageView startStopImage;
     public ImageView closeButton;
@@ -53,9 +67,17 @@ public class MainController {
         });
 
         startStop.setOnMouseClicked(e -> {
+            if (mediaPlayer == null)
+                return;
+
             playing = !playing;
             Image image = playing ? new Image("/pause.png") : new Image("/play.png");
             startStopImage.setImage(image);
+
+            if (playing)
+                mediaPlayer.play();
+            else
+                mediaPlayer.pause();
         });
 
         //playlist menu
@@ -155,9 +177,45 @@ public class MainController {
             menu.setVisible(false);
         }
     }
-    public void onFindClick(ActionEvent actionEvent) {
 
+    public void onFindClick(ActionEvent actionEvent) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Chọn file nhạc");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter(
+                        "Audio files (*.mp3, *.flac, *.wav, *.m4a, *.mp4, *.wma, *.aac)",
+                        "*.mp3", "*.flac", "*.wav", "*.m4a", "*.mp4", "*.wma", "*.aac"
+                )
+        );
+
+        Stage stage = (Stage) root.getScene().getWindow();
+
+        musicFiles = fileChooser.showOpenMultipleDialog(stage);
+
+        startStopImage.setImage(new Image("/pause.png"));
+
+        media = new Media(musicFiles.get(0).toURI().toString());
+
+        mediaPlayer = new MediaPlayer(media);
+        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+        mediaPlayer.play();
+
+        mediaPlayer.setOnReady(() -> {
+            songTitle.setText(musicFiles.get(0).getName());
+            songDuration.setText("" + media.getDuration().toMinutes());
+        });
+
+        timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                progressBar.setValue((mediaPlayer.getCurrentTime().toSeconds() / media.getDuration().toSeconds()) * 100);
+            }
+        };
+
+        timer.scheduleAtFixedRate(task, 1000, 1000);
     }
+
     public void onScroll(ScrollEvent scrollEvent) {
         if (vbox.getTranslateY()<=0){
             vbox.setTranslateY(vbox.getTranslateY() + scrollEvent.getDeltaY());
