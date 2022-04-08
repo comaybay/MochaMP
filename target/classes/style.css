@@ -25,6 +25,10 @@
     -fx-pref-height: 12px;
 }
 
+.scroll-pane > .viewport{
+   -fx-background-color: -primary;
+}
+
 /*========================*/
 
 .red {
