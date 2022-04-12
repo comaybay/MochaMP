@@ -100,6 +100,8 @@ public class MusicPlayerLogic {
         Stage stage = (Stage) root.getScene().getWindow();
 
         List<File> selectedFiles = fileChooser.showOpenMultipleDialog(stage);
+        selectedFiles = selectedFiles == null ? new ArrayList<>() : selectedFiles;
+
         musicFiles.addAll(selectedFiles);
 
         for (File file: selectedFiles) {
@@ -121,9 +123,9 @@ public class MusicPlayerLogic {
         return currentMedia;
     }
 
-    public File getCurrentMusicFile() {
-        return currentMusicFile;
-    }
+    public int getCurrentSongIndex() {return mediaFiles.indexOf(currentMedia);}
+
+    public File getCurrentMusicFile() { return currentMusicFile; }
 
     public void stopCurrentSong() {
         if (mediaPlayer != null)
@@ -141,6 +143,10 @@ public class MusicPlayerLogic {
     }
 
     public void playSongByIndex(int index, Runnable onMediaPlayerReady) {
+        if (mediaFiles.size() == 0) {
+            return;
+        }
+
         playing = true;
         startStopImage.setImage(new Image("/pause.png"));
 

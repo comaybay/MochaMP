@@ -55,13 +55,13 @@
 }
 
 .Menu {
-    -fx-background-image :url('file:D:/Hoc_Tap/Ngon_ngu_Java/MochaMP-master(test)/src/main/image/2x/outline_menu_white_18dp.png');
+    -fx-background-image :url('image/2x/outline_menu_white_18dp.png');
 }
 .Find {
-    -fx-background-image :url('file:D:/Hoc_Tap/Ngon_ngu_Java/MochaMP-master(test)/src/main/image/2x/outline_search_white_18dp.png');
+    -fx-background-image :url('image/2x/outline_search_white_18dp.png');
 }
 .Play {
-    -fx-background-image :url('file:D:/Hoc_Tap/Ngon_ngu_Java/MochaMP-master(test)/src/main/image/2x/outline_play_circle_filled_white_18dp.png');
+    -fx-background-image :url('image/2x/outline_play_circle_filled_white_18dp.png');
 }
 .playing_song_border {
     -fx-border-color: DarkOrchid;
@@ -69,10 +69,10 @@
     -fx-border-width: 3;
 }
 .Pause_18 {
-    -fx-background-image :url('file:D:/Hoc_Tap/Ngon_ngu_Java/MochaMP-master(test)/src/main/image/2x/outline_pause_circle_filled_white_18dp.png');
+    -fx-background-image :url('image/2x/outline_pause_circle_filled_white_18dp.png');
 }
 .dot {
-    -fx-background-image :url('file:D:/Hoc_Tap/Ngon_ngu_Java/MochaMP-master(test)/src/main/image/2x/outline_more_vert_white_18dp.png');
+    -fx-background-image :url('image/2x/outline_more_vert_white_18dp.png');
 }
 .white {
     -fx-background-color: White;

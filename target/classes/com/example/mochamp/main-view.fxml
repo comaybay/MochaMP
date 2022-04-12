@@ -82,7 +82,7 @@
                         </StackPane>
                         <StackPane fx:id="startStopButton" prefWidth="50.0">
                            <children>
-                              <Circle fill="WHITE" radius="25.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 30, 0, 0, 0); -fx-background-radius: 100;" />
+                              <Circle fill="WHITE" radius="25.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 15, 0, 0, 0); -fx-background-radius: 100;" />
                               <ImageView fx:id="startStopImage" fitHeight="24.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@../../../play.png" />
