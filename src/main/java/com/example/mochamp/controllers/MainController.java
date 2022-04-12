@@ -8,6 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
@@ -41,6 +42,8 @@ public class MainController {
     public ImageView thumbnail;
     public Slider progressBar;
     public StackPane startStopButton;
+    public StackPane prevSong;
+    public StackPane nextSong;
     public ImageView startStopImage;
     public ImageView closeButton;
     public ImageView minimizeButton;
@@ -50,6 +53,11 @@ public class MainController {
     public Pane menu,playlist;
     public Label text;
     public VBox songContainer;
+
+    public Border songCardFocusBorder;
+    public Background bgPause;
+    public Background bgPlay;
+    public Background bgDot;
 
     public void initialize() {
         closeButton.setOnMouseClicked(e -> Platform.exit());
@@ -64,31 +72,65 @@ public class MainController {
                 startStopImage, openSongsButton, songContainer
         );
 
-        //playlist menu
         menu.setVisible(false);
 
         //default image thumbnail
         thumbnail.setImage(imageCropSquare(new Image("/author.png")));
         thumbnail.setClip(new Circle(62.5, 62.5, 62.5));
 
+        //backgrounds
+        Image img_pause = new Image("image/2x/outline_pause_circle_filled_white_18dp.png");
+        BackgroundImage bgImagedot = new BackgroundImage(img_pause, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+        bgPause = new Background(bgImagedot);
+
+        Image img_play = new Image("image/2x/outline_play_circle_filled_white_18dp.png");
+        BackgroundImage bgImagePlay = new BackgroundImage(img_play, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+        bgPlay = new Background(bgImagePlay);
+
+        Image img_dot = new Image("image/2x/outline_more_vert_white_18dp.png");
+        BackgroundImage bgImageDot = new BackgroundImage(img_dot, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+        bgDot = new Background(bgImageDot);
+
+        songCardFocusBorder = new Border(new BorderStroke(Color.DARKORCHID,
+                Color.DARKORCHID,
+                Color.DARKORCHID,
+                Color.DARKORCHID,
+                BorderStrokeStyle.SOLID,
+                BorderStrokeStyle.SOLID,
+                BorderStrokeStyle.SOLID,
+                BorderStrokeStyle.SOLID,
+                new CornerRadii(10), BorderWidths.DEFAULT,
+                new Insets(1)));
+
         startStopButton.setOnMouseClicked(e -> musicPlayerLogic.handleStartStopSong());
 
         openSongsButton.setOnAction(e -> onOpenSongs());
 
         musicPlayerLogic.useProgressBarLogic();
+
+        prevSong.setOnMouseClicked(e -> musicPlayerLogic.playPrevSong(() -> updatePlayerUIToCurrentSong()));
+        nextSong.setOnMouseClicked(e -> musicPlayerLogic.playNextSong(() -> updatePlayerUIToCurrentSong()));
     }
 
     public void onOpenSongs() {
-        musicPlayerLogic.openSongChooserDialog();
+        int prevPlaylistLength =  musicPlayerLogic.getMusicFiles().size();
+
+        List<File> selectedFiles = musicPlayerLogic.openSongChooserDialog();
 
         List<File> musicFiles =  musicPlayerLogic.getMusicFiles();
         List<Media> mediaFiles = musicPlayerLogic.getMediaFiles();
-        for (int i = 0; i < musicFiles.size(); i++) {
+
+        for (int i = musicFiles.size() - selectedFiles.size(); i < musicFiles.size(); i++) {
             Pane songComponent = createSongComponent(musicFiles.get(i), mediaFiles.get(i));
             songContainer.getChildren().add(songComponent);
         }
 
-        musicPlayerLogic.playFirstSongInPlaylist(() -> updatePlayerUIToCurrentSong());
+        if (selectedFiles.size() != 0) {
+            musicPlayerLogic.playSongByIndex(prevPlaylistLength, () -> updatePlayerUIToCurrentSong());
+        }
     }
 
     public void updatePlayerUIToCurrentSong() {
@@ -108,15 +150,11 @@ public class MainController {
 
     public Pane createSongComponent(File songFile, Media mediaFile) {
         //button play
-        Image img = new Image("file:/"+System.getProperty("user.dir").replace("\\", "/")+"/src/main/image/2x/outline_play_circle_filled_white_18dp.png");
-        BackgroundImage bgImage = new BackgroundImage(img, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
-                BackgroundSize.DEFAULT);
-        Background bg = new Background(bgImage);
         Button btn_play = new Button();
         btn_play.setPrefSize(35,35);
         btn_play.setLayoutX(15);
         btn_play.setLayoutY(15);
-        btn_play.setBackground(bg);
+        btn_play.setBackground(bgPlay);
         //text song
         Label songName = new Label(getNameWithoutExtension(songFile));
         songName.setPrefSize(169,27);
@@ -132,47 +170,16 @@ public class MainController {
         artist.setFont(new Font(12));
         artist.setTextFill(Color.WHITE);
         //button dot
-        Image img_dot = new Image("file:/"+System.getProperty("user.dir").replace("\\", "/")+"/src/main/image/2x/outline_more_vert_white_18dp.png");
-        BackgroundImage bgImagedot = new BackgroundImage(img_dot, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
-                BackgroundSize.DEFAULT);
-        Background bgdot = new Background(bgImagedot);
         Button btn_dot = new Button();
         btn_dot.setPrefSize(36,31);
         btn_dot.setLayoutX(243);
         btn_dot.setLayoutY(12);
-        btn_dot.setBackground(bgdot);
+        btn_dot.setBackground(bgDot);
         //creat pane
         Pane pane = new Pane();
         pane.setPrefSize(200,74);
         pane.getChildren().addAll(btn_play,artist,songName,btn_dot);
-        Border  appmntBorder = new Border(new BorderStroke(Color.DARKORCHID,
-                Color.DARKORCHID,
-                Color.DARKORCHID,
-                Color.DARKORCHID,
-                BorderStrokeStyle.SOLID,
-                BorderStrokeStyle.SOLID,
-                BorderStrokeStyle.SOLID,
-                BorderStrokeStyle.SOLID,
-                new CornerRadii(10), BorderWidths.DEFAULT,
-                new Insets(1)));
-        pane.setOnMouseClicked(
-                new EventHandler() {
-                    @Override
-                    public void handle(Event event) {
-                        pane.setBorder(appmntBorder);
-                        Image img = new Image("file:/"+System.getProperty("user.dir").replace("\\", "/")+"/src/main/image/2x/outline_pause_circle_filled_white_18dp.png");
-                        BackgroundImage bgImage = new BackgroundImage(img, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
-                                BackgroundSize.DEFAULT);
-                        Background bg = new Background(bgImage);
-                        Button btn_play = new Button();
-                        btn_play.setPrefSize(35,35);
-                        btn_play.setLayoutX(15);
-                        btn_play.setLayoutY(15);
-                        btn_play.setBackground(bg);
-                        pane.getChildren().setAll(btn_play,artist,songName,btn_dot);
-                    }
-                });
-
+        pane.setOnMouseClicked(e -> handleSongSelected(pane, mediaFile));
 
         // wait till metadata is found to set info
         mediaFile.getMetadata().addListener((MapChangeListener<String, Object>) change  -> {
@@ -188,6 +195,27 @@ public class MainController {
         });
 
         return pane;
+    }
+
+    public void handleSongSelected(Pane selectedSongCard, Media mediaFile) {
+        for (Node node : songContainer.getChildren()) {
+            Pane songCard = (Pane) node;
+            songCard.setBorder(null);
+            Button btn_play = (Button)selectedSongCard.getChildren().get(0);
+            btn_play.setBackground(bgPause);
+        };
+
+        selectedSongCard.setBorder(songCardFocusBorder);
+
+        Button btn_play = (Button)selectedSongCard.getChildren().get(0);
+        btn_play.setPrefSize(35,35);
+        btn_play.setLayoutX(15);
+        btn_play.setLayoutY(15);
+        btn_play.setBackground(bgPlay);
+
+        //logic
+        int index = musicPlayerLogic.getMediaFiles().indexOf(mediaFile);
+        musicPlayerLogic.playSongByIndex(index, () -> updatePlayerUIToCurrentSong());
     }
 
     public String getNameWithoutExtension(File file) {

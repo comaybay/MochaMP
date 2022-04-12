@@ -31,7 +31,6 @@ public class HelloApplication extends Application {
 
         String css = this.getClass().getClassLoader().getResource("style.css").toExternalForm();
         scene.getStylesheets().add(css);
-//        scene.getStylesheets().add("file:/"+System.getProperty("user.dir").replace("\\", "/")+"/src/main/css/style.css");
 
         scene.setFill(Color.TRANSPARENT);
         stage.initStyle(StageStyle.TRANSPARENT);

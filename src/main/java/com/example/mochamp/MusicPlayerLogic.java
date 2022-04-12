@@ -57,6 +57,7 @@ public class MusicPlayerLogic {
         this.root = root;
         this.thumbnail = thumbnail;
 
+        musicFiles = new ArrayList<>();
         mediaFiles = new ArrayList<>();
         progressBarTimeline = createProgressBarTimeline();
     }
@@ -82,7 +83,11 @@ public class MusicPlayerLogic {
     }
 
 
-    public void openSongChooserDialog() {
+    /**
+    Mở FileChooser để chọn bài hát
+    @return danh sách bài hát người dùng đã chọn
+     */
+    public List<File> openSongChooserDialog() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Chọn file nhạc");
         fileChooser.getExtensionFilters().add(
@@ -93,11 +98,15 @@ public class MusicPlayerLogic {
         );
 
         Stage stage = (Stage) root.getScene().getWindow();
-        musicFiles = fileChooser.showOpenMultipleDialog(stage);
 
-        for (File file: musicFiles) {
+        List<File> selectedFiles = fileChooser.showOpenMultipleDialog(stage);
+        musicFiles.addAll(selectedFiles);
+
+        for (File file: selectedFiles) {
             mediaFiles.add(new Media(file.toURI().toString()));
         }
+
+        return selectedFiles;
     }
 
     public List<File> getMusicFiles() {
@@ -116,22 +125,36 @@ public class MusicPlayerLogic {
         return currentMusicFile;
     }
 
-    public MediaPlayer playFirstSongInPlaylist(Runnable onMediaPlayerReady) {
+    public void stopCurrentSong() {
+        if (mediaPlayer != null)
+            mediaPlayer.pause();
+    }
+
+    public void playNextSong(Runnable onMediaPlayerReady) {
+        int index = Math.min(mediaFiles.indexOf(currentMedia) + 1, mediaFiles.size() - 1) ;
+        playSongByIndex(index, onMediaPlayerReady);
+    }
+
+    public void playPrevSong(Runnable onMediaPlayerReady) {
+        int index = Math.max(mediaFiles.indexOf(currentMedia) - 1, 0);
+        playSongByIndex(index, onMediaPlayerReady);
+    }
+
+    public void playSongByIndex(int index, Runnable onMediaPlayerReady) {
         playing = true;
         startStopImage.setImage(new Image("/pause.png"));
 
-        currentMusicFile = musicFiles.get(0);
-        currentMedia = new Media(currentMusicFile.toURI().toString());
+        currentMusicFile = musicFiles.get(index);
+        currentMedia = mediaFiles.get(index);
+
+        stopCurrentSong();
+
         mediaPlayer = new MediaPlayer(currentMedia);
         mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
         mediaPlayer.play();
         progressBarTimeline.playFromStart();
 
         mediaPlayer.setOnReady(onMediaPlayerReady);
-
-        //play music
-        return mediaPlayer;
-
     }
 
     private Timeline createProgressBarTimeline() {
