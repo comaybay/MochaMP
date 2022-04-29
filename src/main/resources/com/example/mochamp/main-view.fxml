@@ -47,7 +47,15 @@
                         <Font size="18.0" />
                      </font>
                      <VBox.margin>
-                        <Insets bottom="5.0" top="5.0" />
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="songArtist" alignment="CENTER" prefWidth="260.0" text="Tác giả" textFill="WHITE">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets bottom="5.0" />
                      </VBox.margin>
                   </Label>
                   <HBox prefWidth="260.0" style="-fx-view-order: 0;">
@@ -126,12 +134,33 @@
                <children>
                   <Button layoutX="22.0" layoutY="49.0" onAction="#onHelloButtonClick" prefHeight="31.0" prefWidth="35.0" styleClass="Menu" />
                   <Button fx:id="openSongsButton" layoutX="244.0" layoutY="49.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="35.0" styleClass="Find" />
-                  <Label fx:id="text" alignment="CENTER" layoutX="54.0" layoutY="89.0" prefHeight="35.0" prefWidth="201.0" text="Rockstart" textFill="WHITE">
+                  <Button fx:id="shuffleSongsButton" layoutX="88.0" layoutY="129.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="27.0">
                      <font>
-                        <Font name="System Bold" size="24.0" />
+                        <Font size="1.0" />
                      </font>
-                  </Label>
-                  <Label alignment="CENTER" layoutX="54.0" layoutY="122.0" prefHeight="21.0" prefWidth="201.0" text="A.R Rahaman" textFill="WHITE" />
+                     <styleClass>
+                        <String fx:value="btn-img" />
+                        <String fx:value="bg-shuffle" />
+                     </styleClass>
+                  </Button>
+                  <Button fx:id="loopAllButton" layoutX="137.0" layoutY="129.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="27.0">
+                     <font>
+                        <Font size="1.0" />
+                     </font>
+                     <styleClass>
+                        <String fx:value="btn-img" />
+                        <String fx:value="bg-loop-all" />
+                     </styleClass>
+                  </Button>
+                  <Button fx:id="loopOneButton" layoutX="187.0" layoutY="129.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="27.0">
+                     <font>
+                        <Font size="1.0" />
+                     </font>
+                     <styleClass>
+                        <String fx:value="btn-img" />
+                        <String fx:value="bg-loop-one" />
+                     </styleClass>
+                  </Button>
                </children>
             </Pane>
             <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="350.0" prefWidth="300.0" style="-fx-fit-to-width: true;" styleClass="panel">

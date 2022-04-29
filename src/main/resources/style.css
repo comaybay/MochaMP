@@ -60,6 +60,44 @@
 .Find {
     -fx-background-image :url('image/2x/outline_search_white_18dp.png');
 }
+
+.Shuffle {
+    -fx-background-image: url('shuffle.png');
+    -fx-background-position: center, center;
+    -fx-background-size: contain;
+    -fx-background-color: transparent;
+    -fx-background-repeat: no-repeat;
+    -fx-opacity: 0.5;
+}
+
+.Shuffle:hover {
+    -fx-opacity: 0.8;
+}
+
+.bg-shuffle {
+    -fx-background-image: url('shuffle.png');
+}
+
+.bg-loop-all {
+    -fx-background-image: url('loop-all.png');
+}
+
+.bg-loop-one {
+    -fx-background-image: url('loop-one.png');
+}
+
+.btn-img {
+    -fx-background-position: center, center;
+    -fx-background-size: contain;
+    -fx-background-color: transparent;
+    -fx-background-repeat: no-repeat;
+    -fx-opacity: 0.5;
+}
+
+.btn-img:hover {
+    -fx-opacity: 0.8;
+}
+
 .Play {
     -fx-background-image :url('image/2x/outline_play_circle_filled_white_18dp.png');
 }

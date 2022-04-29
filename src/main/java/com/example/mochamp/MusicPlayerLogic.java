@@ -40,6 +40,17 @@ public class MusicPlayerLogic {
     private boolean playing = false;
     private Timeline progressBarTimeline = null;
 
+    public boolean isLoopOne() {
+        return loopOne;
+    }
+
+    public boolean isLoopAll() {
+        return loopAll;
+    }
+
+    private boolean loopOne = false;
+    private boolean loopAll = false;
+
     private HBox root;
     private Label songCurrentTime;
     public ImageView thumbnail;
@@ -82,6 +93,15 @@ public class MusicPlayerLogic {
             mediaPlayer.pause();
     }
 
+    public boolean toggleLoopAll() {
+        loopAll = !loopAll;
+        return loopAll;
+    }
+
+    public boolean toggleLoopOne() {
+        loopOne = !loopOne;
+        return loopOne;
+    }
 
     /**
     Mở FileChooser để chọn bài hát
@@ -156,11 +176,27 @@ public class MusicPlayerLogic {
         stopCurrentSong();
 
         mediaPlayer = new MediaPlayer(currentMedia);
-        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
         mediaPlayer.play();
         progressBarTimeline.playFromStart();
 
         mediaPlayer.setOnReady(onMediaPlayerReady);
+        mediaPlayer.setOnEndOfMedia(() -> {
+            if (loopOne) {
+                mediaPlayer.seek(Duration.ZERO);
+                mediaPlayer.play();
+                return;
+            }
+
+            if (currentMedia == mediaFiles.get(mediaFiles.size() - 1)) {
+                if (loopAll) {
+                    playSongByIndex(0, onMediaPlayerReady);
+                }
+
+                return;
+            }
+
+            playNextSong(onMediaPlayerReady);
+        });
     }
 
     private Timeline createProgressBarTimeline() {

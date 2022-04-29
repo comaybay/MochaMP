@@ -30,6 +30,7 @@ public class MainController {
 
     //head player
     public Label songTitle;
+    public Label songArtist;
     public Label songDuration;
     public Label songCurrentTime;
     public ImageView thumbnail;
@@ -43,6 +44,9 @@ public class MainController {
 
     //playlist menu
     public Button openSongsButton;
+    public Button shuffleSongsButton;
+    public Button loopAllButton;
+    public Button loopOneButton;
     public Pane menu,playlist;
     public Label text;
     public VBox songContainer;
@@ -118,6 +122,27 @@ public class MainController {
 
         openSongsButton.setOnAction(e -> onOpenSongs());
 
+        shuffleSongsButton.setOnAction(e -> {
+            long seed = System.nanoTime();
+            Collections.shuffle(musicPlayerLogic.getMediaFiles(), new Random(seed));
+            Collections.shuffle(musicPlayerLogic.getMusicFiles(), new Random(seed));
+            musicPlayerLogic.playSongByIndex(0, () -> updateUIToCurrentSong());
+        });
+
+        loopAllButton.setOnAction(e ->  {
+            boolean isLoopAll = musicPlayerLogic.toggleLoopAll();
+            loopAllButton.setStyle("-fx-opacity: " + (isLoopAll ? "1" : "0.5"));
+        });
+        loopAllButton.setOnMouseEntered(e -> loopAllButton.setStyle("-fx-opacity: 0.8"));
+        loopAllButton.setOnMouseExited(e -> loopAllButton.setStyle("-fx-opacity: " + (musicPlayerLogic.isLoopAll() ? "1" : "0.5")));
+
+        loopOneButton.setOnAction(e -> {
+            boolean isLoopOne = musicPlayerLogic.toggleLoopOne();
+            loopOneButton.setStyle("-fx-opacity: " + (isLoopOne ? "1" : "0.5"));
+        });
+        loopOneButton.setOnMouseEntered(e -> loopOneButton.setStyle("-fx-opacity: 0.8"));
+        loopOneButton.setOnMouseExited(e -> loopOneButton.setStyle("-fx-opacity: " + (musicPlayerLogic.isLoopOne() ? "1" : "0.5")));
+
         musicPlayerLogic.useProgressBarLogic();
     }
 
@@ -130,7 +155,7 @@ public class MainController {
         List<Media> mediaFiles = musicPlayerLogic.getMediaFiles();
 
         for (int i = musicFiles.size() - selectedFiles.size(); i < musicFiles.size(); i++) {
-            Pane songComponent = createSongComponent(musicFiles.get(i), mediaFiles.get(i));
+            Pane songComponent = createSongComponent(i);
             songContainer.getChildren().add(songComponent);
         }
 
@@ -146,7 +171,9 @@ public class MainController {
         thumbnail.setImage(image);
 
         String title = (String) metadata.getOrDefault("title", getNameWithoutExtension(musicPlayerLogic.getCurrentMusicFile()));
+        String artist = (String) metadata.getOrDefault("artist", "");
         songTitle.setText(title);
+        songArtist.setText(artist);
 
         int secs = (int) Math.round(currentMedia.getDuration().toSeconds());
         int minPart = secs/60;
@@ -156,7 +183,10 @@ public class MainController {
         updatePlayListUIToCurrentSong();
     }
 
-    public Pane createSongComponent(File songFile, Media mediaFile) {
+    public Pane createSongComponent(int songIndex) {
+        File songFile = musicPlayerLogic.getMusicFiles().get(songIndex);
+        Media mediaFile = musicPlayerLogic.getMediaFiles().get(songIndex);
+
         //button play
         Button btn_play = new Button();
         btn_play.setPrefSize(35,35);
@@ -186,8 +216,8 @@ public class MainController {
         //creat pane
         Pane pane = new Pane();
         pane.setPrefSize(200,74);
-        pane.getChildren().addAll(btn_play,artist,songName,btn_dot);
-        pane.setOnMouseClicked(e -> handleSongSelected(pane, mediaFile));
+        pane.getChildren().addAll(btn_play,songName,artist,btn_dot);
+        pane.setOnMouseClicked(e -> handleSongSelected(songIndex));
 
         // wait till metadata is found to set info
         mediaFile.getMetadata().addListener((MapChangeListener<String, Object>) change  -> {
@@ -205,21 +235,30 @@ public class MainController {
         return pane;
     }
 
-    public void handleSongSelected(Pane selectedSongCard, Media mediaFile) {
-
-        //logic
-        int index = musicPlayerLogic.getMediaFiles().indexOf(mediaFile);
-        musicPlayerLogic.playSongByIndex(index, () -> updateUIToCurrentSong());
+    public void handleSongSelected(int songIndex) {
+        musicPlayerLogic.playSongByIndex(songIndex, () -> updateUIToCurrentSong());
     }
 
     public void updatePlayListUIToCurrentSong() {
         int index = musicPlayerLogic.getCurrentSongIndex();
 
+        int i = 0;
         for (Node node : songContainer.getChildren()) {
             Pane songCard = (Pane) node;
             songCard.setBorder(null);
             Button btn_play = (Button)songCard.getChildren().get(0);
             btn_play.setBackground(bgPlay);
+
+            ObservableMap<String, Object> metadata = musicPlayerLogic.getMediaFiles().get(i).getMetadata();
+            String title = (String) metadata.getOrDefault("title", getNameWithoutExtension(musicPlayerLogic.getMusicFiles().get(i)));
+            String artist = (String) metadata.getOrDefault("artist", "");
+
+            Label titleLabel = (Label)songCard.getChildren().get(1);
+            Label artistLabel = (Label)songCard.getChildren().get(2);
+            titleLabel.setText(title);
+            artistLabel.setText(artist);
+
+            i++;
         };
 
         Pane selectedSongCard = (Pane)songContainer.getChildren().get(index);
