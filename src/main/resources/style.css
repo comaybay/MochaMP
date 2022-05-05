@@ -23,4 +23,99 @@
     -fx-background-radius: 0;
     -fx-pref-width: 3px;
     -fx-pref-height: 12px;
+<<<<<<< Updated upstream
 }
+=======
+}
+
+.scroll-pane > .viewport{
+   -fx-background-color: -primary;
+}
+
+/*========================*/
+
+.red {
+    color: #ff0000;
+    -fx-background-color: #ff0000;
+    }
+.green {
+    color: #00ff00;
+    -fx-background-color: #00ff00;
+}
+.blue {
+    color: #0000ff;
+    -fx-background-color: blue;
+}
+.plum {
+    -fx-background-color: Plum;
+}
+.purple {
+    -fx-background-color: Purple;
+}
+.BlueViolet {
+    border-radius: 10px;
+    -fx-background-color: linear-gradient(to bottom, -primary, -primary-dark);
+}
+
+.Menu {
+    -fx-background-image :url('image/2x/outline_menu_white_18dp.png');
+}
+.Find {
+    -fx-background-image :url('image/2x/outline_search_white_18dp.png');
+}
+.Play {
+    -fx-background-image :url('image/2x/outline_play_circle_filled_white_18dp.png');
+}
+.playing_song_border {
+    -fx-border-color: DarkOrchid;
+    -fx-border-radius: 10;
+    -fx-border-width: 3;
+}
+.Pause_18 {
+    -fx-background-image :url('image/2x/outline_pause_circle_filled_white_18dp.png');
+}
+.dot {
+    -fx-background-image :url('image/2x/outline_more_vert_white_18dp.png');
+}
+.white {
+    -fx-background-color: White;
+}
+.black {
+    -fx-background-color: Black;
+}
+.black {
+    -fx-background-color: Black;
+}
+.indigo {
+    -fx-background-color: Indigo;
+}
+.slateblue {
+    -fx-background-color: SlateBlue;
+}
+.orchid {
+    -fx-background-color: Orchid;
+}
+.mediumPurple {
+    -fx-background-color: MediumPurple;
+}
+.mediumOrchid {
+    -fx-background-color: MediumOrchid;
+}
+.none {
+    -fx-background-color: none;
+}
+.DarkOrchid {
+    -fx-background-color: DarkOrchid;
+}
+.DarkViolet {
+    -fx-background-color: #8158a6;
+}
+.DarkSlateBlue {
+    -fx-background-color: DarkSlateBlue;
+}
+.bar-background {
+    -fx-control-inner-background: #8158a6;
+    -fx-accent: Plum;
+    border-width: 0;
+}
+>>>>>>> Stashed changes
