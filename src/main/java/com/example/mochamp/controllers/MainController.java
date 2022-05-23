@@ -1,6 +1,8 @@
 package com.example.mochamp.controllers;
 
+import com.example.mochamp.Database;
 import com.example.mochamp.MusicPlayerLogic;
+import com.example.mochamp.models.RecentlyPlayedSong;
 import javafx.application.Platform;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
@@ -9,9 +11,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -25,9 +25,10 @@ import java.io.File;
 import java.util.*;
 
 public class MainController {
-    public HBox root;
+    private Database db;
     private MusicPlayerLogic musicPlayerLogic = null;
 
+    public HBox root;
     //head player
     public Label songTitle;
     public Label songArtist;
@@ -43,6 +44,7 @@ public class MainController {
     public ImageView minimizeButton;
 
     //playlist menu
+    public Menu recentlyPlayedSongMenu;
     public Button openSongsButton;
     public Button shuffleSongsButton;
     public Button loopAllButton;
@@ -56,7 +58,17 @@ public class MainController {
     public Background bgPlay;
     public Background bgDot;
 
-    public void initialize() {
+    public void initialize() throws Exception {
+        db = new Database(
+                "jdbc:postgresql://localhost:5432/",
+                "postgres",
+                "postgres"
+        );
+
+        db.init();
+        db.getSavedPlaylists();
+        db.getRecentlyPlayedSongs();
+
         closeButton.setOnMouseClicked(e -> Platform.exit());
 
         minimizeButton.setOnMouseClicked(e -> {
@@ -65,7 +77,7 @@ public class MainController {
         });
 
         musicPlayerLogic = new MusicPlayerLogic(
-                root, songTitle, songDuration, songCurrentTime, thumbnail, progressBar, startStopButton,
+                db, root, songTitle, songDuration, songCurrentTime, thumbnail, progressBar, startStopButton,
                 startStopImage, openSongsButton, songContainer
         );
 
@@ -110,15 +122,19 @@ public class MainController {
 
         prevSong.setOnMouseClicked(e ->  {
             if (e.getTarget() != prevSong) {
-                musicPlayerLogic.playPrevSong(() -> updateUIToCurrentSong());
+                musicPlayerLogic.playPrevSong(this::updateUIToCurrentSong);
             }
         });
 
         nextSong.setOnMouseClicked(e -> {
             if (e.getTarget() != nextSong) {
-                musicPlayerLogic.playNextSong(() -> updateUIToCurrentSong());
+                musicPlayerLogic.playNextSong(this::updateUIToCurrentSong);
             }
         });
+
+        //Playlist menu
+        recentlyPlayedSongMenu.setOnShowing(e -> updateRecentlyPlayedSongsMenu());
+        updateRecentlyPlayedSongsMenu();
 
         openSongsButton.setOnAction(e -> onOpenSongs());
 
@@ -126,7 +142,7 @@ public class MainController {
             long seed = System.nanoTime();
             Collections.shuffle(musicPlayerLogic.getMediaFiles(), new Random(seed));
             Collections.shuffle(musicPlayerLogic.getMusicFiles(), new Random(seed));
-            musicPlayerLogic.playSongByIndex(0, () -> updateUIToCurrentSong());
+            musicPlayerLogic.playSongByIndex(0, this::updateUIToCurrentSong);
         });
 
         loopAllButton.setOnAction(e ->  {
@@ -146,6 +162,23 @@ public class MainController {
         musicPlayerLogic.useProgressBarLogic();
     }
 
+    private void updateRecentlyPlayedSongsMenu() {
+        recentlyPlayedSongMenu.getItems().clear();
+        for (RecentlyPlayedSong rps : db.getRecentlyPlayedSongs()) {
+            MenuItem item = new MenuItem(rps.getName());
+            item.setOnAction(mouseE -> {
+                musicPlayerLogic.playRecentlyPlayedSong(rps, () -> {
+                    Pane songComponent = createSongComponent(0);
+                    songContainer.getChildren().clear();
+                    songContainer.getChildren().add(songComponent);
+
+                    updateUIToCurrentSong();
+                });
+            });
+            recentlyPlayedSongMenu.getItems().add(item);
+        };
+    }
+
     public void onOpenSongs() {
         int prevPlaylistLength =  musicPlayerLogic.getMusicFiles().size();
 
@@ -160,7 +193,7 @@ public class MainController {
         }
 
         if (selectedFiles.size() != 0) {
-            musicPlayerLogic.playSongByIndex(prevPlaylistLength, () -> updateUIToCurrentSong());
+            musicPlayerLogic.playSongByIndex(prevPlaylistLength, this::updateUIToCurrentSong);
         }
     }
 
@@ -236,7 +269,7 @@ public class MainController {
     }
 
     public void handleSongSelected(int songIndex) {
-        musicPlayerLogic.playSongByIndex(songIndex, () -> updateUIToCurrentSong());
+        musicPlayerLogic.playSongByIndex(songIndex, this::updateUIToCurrentSong);
     }
 
     public void updatePlayListUIToCurrentSong() {

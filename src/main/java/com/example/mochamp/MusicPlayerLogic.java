@@ -1,5 +1,6 @@
 package com.example.mochamp;
 
+import com.example.mochamp.models.RecentlyPlayedSong;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -33,10 +34,10 @@ import java.util.Timer;
 public class MusicPlayerLogic {
     private List<File> musicFiles;
     private List<Media> mediaFiles;
+    private Database db;
     private Media currentMedia;
     private File currentMusicFile;
     private MediaPlayer mediaPlayer;
-    private Timer timer;
     private boolean playing = false;
     private Timeline progressBarTimeline = null;
 
@@ -58,10 +59,12 @@ public class MusicPlayerLogic {
     private ImageView startStopImage;
 
     public MusicPlayerLogic(
-            HBox root, Label songTitle, Label songDuration, Label songCurrentTime, ImageView thumbnail,
+            Database db, HBox root, Label songTitle, Label songDuration, Label songCurrentTime, ImageView thumbnail,
             Slider progressBar, StackPane startStopButton, ImageView startStopImage,
             Button openSongsButton, VBox songContainer
     ) {
+        this.db = db;
+
         this.songCurrentTime = songCurrentTime;
         this.progressBar = progressBar;
         this.startStopImage = startStopImage;
@@ -131,6 +134,22 @@ public class MusicPlayerLogic {
         return selectedFiles;
     }
 
+    public void playRecentlyPlayedSong(RecentlyPlayedSong rps, Runnable onMediaPlayerReady) {
+        File file = new File(rps.getPath());
+
+        musicFiles.clear();
+        musicFiles.add(file);
+
+        mediaFiles.clear();
+        mediaFiles.add(new Media(file.toURI().toString()));
+
+        playSongByIndex(0, onMediaPlayerReady);
+
+        //move rps to top of list
+        db.deleteRecentlyPlayedSongById(rps.getId());
+        db.insertRecentlyPlayedSong(rps);
+    }
+
     public List<File> getMusicFiles() {
         return musicFiles;
     }
@@ -179,7 +198,18 @@ public class MusicPlayerLogic {
         mediaPlayer.play();
         progressBarTimeline.playFromStart();
 
-        mediaPlayer.setOnReady(onMediaPlayerReady);
+        mediaPlayer.setOnReady(() -> {
+            db.deleteRecentlyPlayedSongByPath(currentMusicFile.getPath());
+
+            ObservableMap<String, Object> metadata = currentMedia.getMetadata();
+            db.insertRecentlyPlayedSong(new RecentlyPlayedSong(
+                -1,
+                (String) metadata.getOrDefault("title", getNameWithoutExtension(currentMusicFile)),
+                currentMusicFile.getPath()
+            ));
+
+            onMediaPlayerReady.run();
+        });
         mediaPlayer.setOnEndOfMedia(() -> {
             if (loopOne) {
                 mediaPlayer.seek(Duration.ZERO);

@@ -132,9 +132,19 @@
          <children>
             <Pane prefHeight="160.0" prefWidth="300.0" style="-fx-background-radius: 15; -fx-view-order: 10;" styleClass="BlueViolet">
                <children>
-                  <Button layoutX="22.0" layoutY="49.0" onAction="#onHelloButtonClick" prefHeight="31.0" prefWidth="35.0" styleClass="Menu" />
-                  <Button fx:id="openSongsButton" layoutX="244.0" layoutY="49.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="35.0" styleClass="Find" />
+                  <MenuBar layoutX="0" layoutY="0">
+                     <Menu fx:id="recentlyPlayedSongMenu" text="Bài hát đã chơi gần đây">
+
+                     </Menu>
+                  </MenuBar>
+                  <Button layoutX="22.0" layoutY="49.0" onAction="#onHelloButtonClick" prefHeight="31.0" prefWidth="35.0" styleClass="Menu">
+                     <tooltip><Tooltip text="Mở tùy chọn" /></tooltip>
+                  </Button>
+                  <Button fx:id="openSongsButton" layoutX="244.0" layoutY="49.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="35.0" styleClass="Find">
+                     <tooltip><Tooltip text="Mở file nhạc" /></tooltip>
+                  </Button>
                   <Button fx:id="shuffleSongsButton" layoutX="88.0" layoutY="129.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="27.0">
+                     <tooltip><Tooltip style="-fx-font-size: 11px" text="Trộn ngẫu nhiên bài hát trong playlist" /></tooltip>
                      <font>
                         <Font size="1.0" />
                      </font>
@@ -144,6 +154,7 @@
                      </styleClass>
                   </Button>
                   <Button fx:id="loopAllButton" layoutX="137.0" layoutY="129.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="27.0">
+                     <tooltip><Tooltip style="-fx-font-size: 11px" text="Lặp lại playlist" /></tooltip>
                      <font>
                         <Font size="1.0" />
                      </font>
@@ -153,6 +164,7 @@
                      </styleClass>
                   </Button>
                   <Button fx:id="loopOneButton" layoutX="187.0" layoutY="129.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="27.0">
+                     <tooltip><Tooltip style="-fx-font-size: 11px" text="Lặp lại bài hát hiện tại" /></tooltip>
                      <font>
                         <Font size="1.0" />
                      </font>
