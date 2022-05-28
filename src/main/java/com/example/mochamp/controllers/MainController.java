@@ -1,14 +1,17 @@
 package com.example.mochamp.controllers;
 
 import com.example.mochamp.Database;
+import com.example.mochamp.HelloApplication;
 import com.example.mochamp.MusicPlayerLogic;
 import com.example.mochamp.models.RecentlyPlayedSong;
 import javafx.application.Platform;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
@@ -20,9 +23,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MainController {
     private Database db;
@@ -46,6 +52,7 @@ public class MainController {
     //playlist menu
     public Menu recentlyPlayedSongMenu;
     public Button openSongsButton;
+    public Button savePlaylistButton;
     public Button shuffleSongsButton;
     public Button loopAllButton;
     public Button loopOneButton;
@@ -59,15 +66,7 @@ public class MainController {
     public Background bgDot;
 
     public void initialize() throws Exception {
-        db = new Database(
-                "jdbc:postgresql://localhost:5432/",
-                "postgres",
-                "postgres"
-        );
-
-        db.init();
-        db.getSavedPlaylists();
-        db.getRecentlyPlayedSongs();
+        db = Database.getInstance();
 
         closeButton.setOnMouseClicked(e -> Platform.exit());
 
@@ -77,7 +76,7 @@ public class MainController {
         });
 
         musicPlayerLogic = new MusicPlayerLogic(
-                db, root, songTitle, songDuration, songCurrentTime, thumbnail, progressBar, startStopButton,
+                root, songTitle, songDuration, songCurrentTime, thumbnail, progressBar, startStopButton,
                 startStopImage, openSongsButton, songContainer
         );
 
@@ -138,6 +137,8 @@ public class MainController {
 
         openSongsButton.setOnAction(e -> onOpenSongs());
 
+        savePlaylistButton.setOnAction(e -> onSavePlaylist());
+
         shuffleSongsButton.setOnAction(e -> {
             long seed = System.nanoTime();
             Collections.shuffle(musicPlayerLogic.getMediaFiles(), new Random(seed));
@@ -194,6 +195,26 @@ public class MainController {
 
         if (selectedFiles.size() != 0) {
             musicPlayerLogic.playSongByIndex(prevPlaylistLength, this::updateUIToCurrentSong);
+        }
+    }
+
+    public void onSavePlaylist() {
+        try {
+            if (musicPlayerLogic.getMusicFiles().size() > 0) {
+                FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("save-playlist-dialog.fxml"));
+                // Get the Controller from the FXMLLoader
+                DialogPane pane = loader.load();
+
+                SavePlaylistDialogController controller = loader.getController();
+                controller.setMusicPlayerLogic(musicPlayerLogic);
+
+                Dialog<ButtonType> dialog = new Dialog<>();
+                dialog.initStyle(StageStyle.UNDECORATED);
+                dialog.setDialogPane(pane);
+                dialog.show();
+            }
+        } catch (Exception ex){
+            ex.printStackTrace();
         }
     }
 

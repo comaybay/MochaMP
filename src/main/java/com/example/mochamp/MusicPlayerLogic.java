@@ -1,5 +1,6 @@
 package com.example.mochamp;
 
+import com.example.mochamp.models.Playlist;
 import com.example.mochamp.models.RecentlyPlayedSong;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -28,8 +29,10 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
+import java.util.stream.Collectors;
 
 public class MusicPlayerLogic {
     private List<File> musicFiles;
@@ -39,6 +42,7 @@ public class MusicPlayerLogic {
     private File currentMusicFile;
     private MediaPlayer mediaPlayer;
     private boolean playing = false;
+    private Playlist playList = null;
     private Timeline progressBarTimeline = null;
 
     public boolean isLoopOne() {
@@ -59,11 +63,11 @@ public class MusicPlayerLogic {
     private ImageView startStopImage;
 
     public MusicPlayerLogic(
-            Database db, HBox root, Label songTitle, Label songDuration, Label songCurrentTime, ImageView thumbnail,
+            HBox root, Label songTitle, Label songDuration, Label songCurrentTime, ImageView thumbnail,
             Slider progressBar, StackPane startStopButton, ImageView startStopImage,
             Button openSongsButton, VBox songContainer
-    ) {
-        this.db = db;
+    ) throws Exception {
+        this.db = Database.getInstance();
 
         this.songCurrentTime = songCurrentTime;
         this.progressBar = progressBar;
@@ -208,7 +212,9 @@ public class MusicPlayerLogic {
                 currentMusicFile.getPath()
             ));
 
-            onMediaPlayerReady.run();
+            if (onMediaPlayerReady != null) {
+                onMediaPlayerReady.run();
+            }
         });
         mediaPlayer.setOnEndOfMedia(() -> {
             if (loopOne) {
@@ -257,5 +263,13 @@ public class MusicPlayerLogic {
 
         prevX = Math.round(e.getX());
         mediaPlayer.seek(Duration.seconds(time));
+    }
+
+    public void playSongInPlaylist(Playlist playlist, Runnable onMediaPlayerReady) {
+        playList = playlist;
+        musicFiles = Arrays.stream(playlist.getSongPaths()).map(path -> new File(path)).collect(Collectors.toList());
+        mediaFiles = musicFiles.stream().map(f -> new Media(f.toURI().toString())).collect(Collectors.toList());
+
+        playSongByIndex(0, onMediaPlayerReady);
     }
 }

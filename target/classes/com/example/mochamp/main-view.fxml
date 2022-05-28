@@ -137,13 +137,21 @@
 
                      </Menu>
                   </MenuBar>
-                  <Button fx:id="openSongsButton" layoutX="22.0" layoutY="49.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="35.0" styleClass="Find">
+                  <Button fx:id="openSongsButton" layoutX="22.0" layoutY="45.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="35.0">
                      <tooltip><Tooltip text="Mở file nhạc" /></tooltip>
+                     <styleClass>
+                        <String fx:value="bg-open-files" />
+                        <String fx:value="btn-img" />
+                     </styleClass>
                   </Button>
-                  <Button fx:id="selectPlaylistButton" layoutX="66.0" layoutY="49.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="35.0" styleClass="open-playlist">
+                  <Button fx:id="selectPlaylistButton" layoutX="66.0" layoutY="50.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="35.0">
                      <tooltip><Tooltip text="Chọn playlist đã lưu" /></tooltip>
+                     <styleClass>
+                        <String fx:value="btn-img" />
+                        <String fx:value="bg-open-playlist" />
+                     </styleClass>
                   </Button>
-                  <Button fx:id="savePlaylistButton" layoutX="251.0" layoutY="129.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="27.0">
+                  <Button fx:id="savePlaylistButton" layoutX="22.0" layoutY="130.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="27.0">
                      <tooltip><Tooltip style="-fx-font-size: 11px" text="Lưu/cập nhật playlist hiện tại" /></tooltip>
                      <font>
                         <Font size="1.0" />
@@ -153,8 +161,12 @@
                         <String fx:value="bg-save-playlist" />
                      </styleClass>
                   </Button>
-                  <Button fx:id="settingsButton" layoutX="244.0" layoutY="49.0" onAction="#onHelloButtonClick" prefHeight="31.0" prefWidth="35.0" styleClass="Menu">
+                  <Button fx:id="settingsButton" layoutX="249.0" layoutY="47.0" onAction="#onHelloButtonClick" prefHeight="31.0" prefWidth="35.0">
                      <tooltip><Tooltip text="Mở tùy chọn" /></tooltip>
+                     <styleClass>
+                        <String fx:value="bg-settings" />
+                        <String fx:value="btn-img" />
+                     </styleClass>
                   </Button>
                   <Button fx:id="shuffleSongsButton" layoutX="88.0" layoutY="129.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="27.0">
                      <tooltip><Tooltip style="-fx-font-size: 11px" text="Trộn ngẫu nhiên bài hát trong playlist" /></tooltip>

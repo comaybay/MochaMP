@@ -3,15 +3,35 @@ package com.example.mochamp;
 import com.example.mochamp.models.Playlist;
 import com.example.mochamp.models.RecentlyPlayedSong;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Database {
     String url;
     String unameDB;
     String passDB;
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+
+    private static Database instance = null;
+    public static Database getInstance() throws Exception{
+        if (instance == null) {
+            List<String> settings = Files.readAllLines(Paths.get("database-settings.txt"))
+                    .stream().map(s -> s.split("=")[1])
+                    .collect(Collectors.toList());
+
+            instance = new Database(settings.get(0), settings.get(1), settings.get(2));
+            instance.init();
+        }
+
+        return instance;
+    }
 
     public Database(String url, String unameDB, String passDB) {
         this.url = url;
@@ -22,7 +42,7 @@ public class Database {
     /**
      * load driver và khởi tạo database nếu chưa có, chỉ chạy hàm này một lần
      */
-    public void init() throws ClassNotFoundException{
+    private void init() throws ClassNotFoundException{
         Class.forName("org.postgresql.Driver"); // load the driver for postgres
 
         try (Connection con = createConnection();
@@ -109,14 +129,14 @@ public class Database {
     }
 
     private String formatField(String[] fieldValues) {
-        String res = "{";
+        String res = "'{";
 
         boolean first = true;
         for (String value : fieldValues) {
-            res += (first ? "'" : ", '") + value + "'";
+            res += (first ? "''" : ", ''") + value + "''";
         }
 
-        return res;
+        return res + "}'";
     }
 
     public void insertRecentlyPlayedSong(RecentlyPlayedSong rps) {
@@ -157,14 +177,26 @@ public class Database {
         }
     }
 
-    public void insertPlaylist(Playlist pl) throws SQLException {
-        Connection con = createConnection();
-        Statement stm = con.createStatement();
+    /**
+     * thêm playlist vào CSDL
+     * @return playlist được thêm vào (chứa cả id được gán trong CSDL)
+     */
+    public Playlist insertPlaylist(Playlist pl) {
+        System.out.println(formatField(pl.getSongPaths()));
+        try (Connection con = createConnection();
+             Statement stm = con.createStatement();) {
+            stm.executeUpdate("INSERT INTO playlists(name, song_paths) VALUES(" +
+                    formatField(pl.getName()) + ","+
+                    formatField(pl.getSongPaths()) +
+                    ")");
 
-        stm.executeUpdate("INSERT INTO recently_played_songs(name, song_paths) VALUES(" +
-                formatField(pl.getName()) + ","+
-                formatField(pl.getSongPaths()) +
-                ")");
+            ResultSet resultSet =  stm.executeQuery("SELECT id FROM playlists ORDER BY id DESC LIMIT 1");
+            resultSet.next();
+            return new Playlist(resultSet.getInt("id"), pl.getName(), pl.getSongPaths());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public void deletePlaylist(Playlist pl)  throws SQLException{

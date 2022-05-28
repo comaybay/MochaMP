@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<DialogPane headerText="Lưu playlist" prefHeight="144.0" prefWidth="270.0" style="-fx-background-radius: 0;" styleClass="panel" stylesheets="@../../../style.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.mochamp.controllers.SavePlaylistDialogController">
+   <content>
+      <Pane minHeight="60">
+         <children>
+            <Label layoutX="21.0" layoutY="22.0" text="Tên playlist:" textFill="WHITE" />
+            <Label fx:id="errorLabel" layoutX="21.0" layoutY="45.0" textFill="#ec3a3a">
+               <font>
+                  <Font size="10.0" />
+               </font></Label>
+            <TextField fx:id="playlistField" layoutX="91.0" layoutY="18.0" />
+            <Button layoutX="154.0" layoutY="57.0" onAction="#onSave" text="Lưu" />
+            <Button layoutX="202.0" layoutY="57.0" onAction="#onCancel" text="Hủy" />
+         </children></Pane>
+   </content>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</DialogPane>

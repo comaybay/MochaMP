@@ -54,13 +54,6 @@
     -fx-background-color: linear-gradient(to bottom, -primary, -primary-dark);
 }
 
-.Menu {
-    -fx-background-image :url('image/2x/outline_menu_white_18dp.png');
-}
-.Find {
-    -fx-background-image :url('image/2x/outline_search_white_18dp.png');
-}
-
 .Shuffle {
     -fx-background-image: url('shuffle.png');
     -fx-background-position: center, center;
@@ -90,6 +83,17 @@
     -fx-background-image :url('save-playlist.png');
 }
 
+.bg-open-playlist {
+    -fx-background-image :url('open-playlist.png');
+}
+
+.bg-settings {
+    -fx-background-image :url('settings.png');
+}
+.bg-open-files {
+    -fx-background-image :url('open-files.png');
+}
+
 .btn-img {
     -fx-background-position: center, center;
     -fx-background-size: contain;
@@ -117,6 +121,18 @@
 .dot {
     -fx-background-image :url('image/2x/outline_more_vert_white_18dp.png');
 }
+
+.dialog-pane:header .header-panel .label {
+    -fx-text-fill: white;
+    -fx-font-size: 18;
+    -fx-padding: 0 0 ;
+}
+
+.dialog-pane:header .header-panel{
+    -fx-background-color: transparent;
+    -fx-padding: 5 5;
+}
+
 .white {
     -fx-background-color: White;
 }
