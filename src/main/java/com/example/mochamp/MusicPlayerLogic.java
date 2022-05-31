@@ -5,13 +5,7 @@ import com.example.mochamp.models.RecentlyPlayedSong;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
-import javafx.event.Event;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -21,8 +15,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -31,7 +23,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Timer;
 import java.util.stream.Collectors;
 
 public class MusicPlayerLogic {
@@ -111,10 +102,18 @@ public class MusicPlayerLogic {
     }
 
     /**
-    Mở FileChooser để chọn bài hát
-    @return danh sách bài hát người dùng đã chọn
+     * Lấy tên của playlist
+     * @return tên playlist, trả về chuỗi trống nếu chưa mở playlist nào
      */
-    public List<File> openSongChooserDialog() {
+    public String getPlayListName() {
+        return playList == null ? "" : playList.getName();
+    }
+
+    /**
+    Chơi bài hát từ FileChooser
+     */
+    public void playSongsFromFileChooser(Runnable onMediaPlayerReady) {
+        playList = null;
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Chọn file nhạc");
         fileChooser.getExtensionFilters().add(
@@ -129,29 +128,16 @@ public class MusicPlayerLogic {
         List<File> selectedFiles = fileChooser.showOpenMultipleDialog(stage);
         selectedFiles = selectedFiles == null ? new ArrayList<>() : selectedFiles;
 
+        int prevPlaylistLength = musicFiles.size();
         musicFiles.addAll(selectedFiles);
 
         for (File file: selectedFiles) {
             mediaFiles.add(new Media(file.toURI().toString()));
         }
 
-        return selectedFiles;
-    }
-
-    public void playRecentlyPlayedSong(RecentlyPlayedSong rps, Runnable onMediaPlayerReady) {
-        File file = new File(rps.getPath());
-
-        musicFiles.clear();
-        musicFiles.add(file);
-
-        mediaFiles.clear();
-        mediaFiles.add(new Media(file.toURI().toString()));
-
-        playSongByIndex(0, onMediaPlayerReady);
-
-        //move rps to top of list
-        db.deleteRecentlyPlayedSongById(rps.getId());
-        db.insertRecentlyPlayedSong(rps);
+        if (selectedFiles.size() != 0) {
+            playSongByIndex(prevPlaylistLength, onMediaPlayerReady);
+        }
     }
 
     public List<File> getMusicFiles() {
@@ -173,6 +159,23 @@ public class MusicPlayerLogic {
     public void stopCurrentSong() {
         if (mediaPlayer != null)
             mediaPlayer.pause();
+    }
+
+    public void playRecentlyPlayedSong(RecentlyPlayedSong rps, Runnable onMediaPlayerReady) {
+        playList = null;
+        File file = new File(rps.getPath());
+
+        musicFiles.clear();
+        musicFiles.add(file);
+
+        mediaFiles.clear();
+        mediaFiles.add(new Media(file.toURI().toString()));
+
+        playSongByIndex(0, onMediaPlayerReady);
+
+        //move rps to top of list
+        db.deleteRecentlyPlayedSongById(rps.getId());
+        db.insertRecentlyPlayedSong(rps);
     }
 
     public void playNextSong(Runnable onMediaPlayerReady) {

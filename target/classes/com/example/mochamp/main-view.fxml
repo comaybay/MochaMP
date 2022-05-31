@@ -125,32 +125,39 @@
                </padding></VBox>
          </children>
       </Pane>
-      <VBox fx:id="slidebar" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="300.0" VBox.vgrow="NEVER">
+      <VBox fx:id="playlist" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="300.0" VBox.vgrow="NEVER">
          <VBox.margin>
             <Insets />
          </VBox.margin>
          <children>
             <Pane prefHeight="160.0" prefWidth="300.0" style="-fx-background-radius: 15; -fx-view-order: 10;" styleClass="BlueViolet">
                <children>
-                  <MenuBar layoutX="23.0" layoutY="14.0">
-                     <Menu fx:id="recentlyPlayedSongMenu" text="Bài hát đã chơi gần đây">
-
-                     </Menu>
-                  </MenuBar>
-                  <Button fx:id="openSongsButton" layoutX="22.0" layoutY="45.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="35.0">
+                  <Button fx:id="selectRecentlyPlayedSongButton" layoutX="66.0" layoutY="14.0" prefHeight="31.0" prefWidth="35.0">
+                     <tooltip><Tooltip text="Bài hát đã chơi gần đây" /></tooltip>
+                     <styleClass>
+                        <String fx:value="btn-img" />
+                        <String fx:value="bg-rps" />
+                     </styleClass>
+                  </Button>
+                  <Button fx:id="openSongsButton" layoutX="22.0" layoutY="14.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="35.0">
                      <tooltip><Tooltip text="Mở file nhạc" /></tooltip>
                      <styleClass>
                         <String fx:value="bg-open-files" />
                         <String fx:value="btn-img" />
                      </styleClass>
                   </Button>
-                  <Button fx:id="selectPlaylistButton" layoutX="66.0" layoutY="50.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="35.0">
+                  <Button fx:id="selectPlaylistButton" layoutX="110.0" layoutY="19.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="35.0">
                      <tooltip><Tooltip text="Chọn playlist đã lưu" /></tooltip>
                      <styleClass>
                         <String fx:value="btn-img" />
                         <String fx:value="bg-open-playlist" />
                      </styleClass>
                   </Button>
+                  <Label fx:id="playlistName" alignment="CENTER" layoutX="20.0" layoutY="67.0" prefHeight="27.0" prefWidth="260.0" textAlignment="CENTER" textFill="WHITE">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
                   <Button fx:id="savePlaylistButton" layoutX="22.0" layoutY="130.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="27.0">
                      <tooltip><Tooltip style="-fx-font-size: 11px" text="Lưu/cập nhật playlist hiện tại" /></tooltip>
                      <font>
@@ -161,7 +168,7 @@
                         <String fx:value="bg-save-playlist" />
                      </styleClass>
                   </Button>
-                  <Button fx:id="settingsButton" layoutX="249.0" layoutY="47.0" onAction="#onHelloButtonClick" prefHeight="31.0" prefWidth="35.0">
+                  <Button fx:id="settingsButton" layoutX="249.0" layoutY="19.0" onAction="#onHelloButtonClick" prefHeight="31.0" prefWidth="35.0">
                      <tooltip><Tooltip text="Mở tùy chọn" /></tooltip>
                      <styleClass>
                         <String fx:value="bg-settings" />

@@ -3,7 +3,7 @@ package com.example.mochamp.controllers;
 import com.example.mochamp.Database;
 import com.example.mochamp.HelloApplication;
 import com.example.mochamp.MusicPlayerLogic;
-import com.example.mochamp.models.RecentlyPlayedSong;
+import com.example.mochamp.Utils;
 import javafx.application.Platform;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
@@ -11,7 +11,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
@@ -26,9 +25,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class MainController {
     private Database db;
@@ -50,15 +47,18 @@ public class MainController {
     public ImageView minimizeButton;
 
     //playlist menu
-    public Menu recentlyPlayedSongMenu;
+    public Button selectRecentlyPlayedSongButton;
+    public Button selectPlaylistButton;
     public Button openSongsButton;
     public Button savePlaylistButton;
     public Button shuffleSongsButton;
     public Button loopAllButton;
     public Button loopOneButton;
-    public Pane menu,playlist;
+    public Pane menu;
     public Label text;
     public VBox songContainer;
+    public VBox playlist;
+    public Label playlistName;
 
     public Border songCardFocusBorder;
     public Background bgPause;
@@ -121,19 +121,32 @@ public class MainController {
 
         prevSong.setOnMouseClicked(e ->  {
             if (e.getTarget() != prevSong) {
-                musicPlayerLogic.playPrevSong(this::updateUIToCurrentSong);
+                musicPlayerLogic.playPrevSong(this::updateUI);
             }
         });
 
         nextSong.setOnMouseClicked(e -> {
             if (e.getTarget() != nextSong) {
-                musicPlayerLogic.playNextSong(this::updateUIToCurrentSong);
+                musicPlayerLogic.playNextSong(this::updateUI);
             }
         });
 
         //Playlist menu
-        recentlyPlayedSongMenu.setOnShowing(e -> updateRecentlyPlayedSongsMenu());
-        updateRecentlyPlayedSongsMenu();
+        selectRecentlyPlayedSongButton.setOnAction(e -> {
+            try {
+                openSelectRPSPopup();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        selectPlaylistButton.setOnAction(e -> {
+            try {
+                openSelectPlaylistPopup();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
 
         openSongsButton.setOnAction(e -> onOpenSongs());
 
@@ -143,7 +156,7 @@ public class MainController {
             long seed = System.nanoTime();
             Collections.shuffle(musicPlayerLogic.getMediaFiles(), new Random(seed));
             Collections.shuffle(musicPlayerLogic.getMusicFiles(), new Random(seed));
-            musicPlayerLogic.playSongByIndex(0, this::updateUIToCurrentSong);
+            musicPlayerLogic.playSongByIndex(0, this::updateUI);
         });
 
         loopAllButton.setOnAction(e ->  {
@@ -163,39 +176,39 @@ public class MainController {
         musicPlayerLogic.useProgressBarLogic();
     }
 
-    private void updateRecentlyPlayedSongsMenu() {
-        recentlyPlayedSongMenu.getItems().clear();
-        for (RecentlyPlayedSong rps : db.getRecentlyPlayedSongs()) {
-            MenuItem item = new MenuItem(rps.getName());
-            item.setOnAction(mouseE -> {
-                musicPlayerLogic.playRecentlyPlayedSong(rps, () -> {
-                    Pane songComponent = createSongComponent(0);
-                    songContainer.getChildren().clear();
-                    songContainer.getChildren().add(songComponent);
+    private void openSelectRPSPopup() throws Exception {
+        if (db.getRecentlyPlayedSongs().size() == 0) {
+            return;
+        }
 
-                    updateUIToCurrentSong();
-                });
-            });
-            recentlyPlayedSongMenu.getItems().add(item);
-        };
+        FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("select-rps.fxml"));
+        AnchorPane pane = loader.load();
+
+        SelectRecentlyPlayedSongController controller = loader.getController();
+        controller.setOnClickItem(rps -> musicPlayerLogic.playRecentlyPlayedSong(rps, this::updateUI));
+
+        Utils.setupPopupPane(pane, selectRecentlyPlayedSongButton)
+             .show();
     }
 
+    private void openSelectPlaylistPopup() throws Exception {
+        if (db.getSavedPlaylists().size() == 0) {
+            return;
+        }
+
+        FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("select-playlist.fxml"));
+        AnchorPane pane = loader.load();
+
+        SelectPlaylistController controller = loader.getController();
+        controller.setOnClickItem(playlist -> musicPlayerLogic.playSongInPlaylist(playlist, this::updateUI));
+
+        Utils.setupPopupPane(pane, selectPlaylistButton)
+             .show();
+    }
+
+
     public void onOpenSongs() {
-        int prevPlaylistLength =  musicPlayerLogic.getMusicFiles().size();
-
-        List<File> selectedFiles = musicPlayerLogic.openSongChooserDialog();
-
-        List<File> musicFiles =  musicPlayerLogic.getMusicFiles();
-        List<Media> mediaFiles = musicPlayerLogic.getMediaFiles();
-
-        for (int i = musicFiles.size() - selectedFiles.size(); i < musicFiles.size(); i++) {
-            Pane songComponent = createSongComponent(i);
-            songContainer.getChildren().add(songComponent);
-        }
-
-        if (selectedFiles.size() != 0) {
-            musicPlayerLogic.playSongByIndex(prevPlaylistLength, this::updateUIToCurrentSong);
-        }
+        musicPlayerLogic.playSongsFromFileChooser(this::updateUI);
     }
 
     public void onSavePlaylist() {
@@ -218,7 +231,15 @@ public class MainController {
         }
     }
 
-    public void updateUIToCurrentSong() {
+    /**
+     * Cập nhật lại UI của chương trình
+     */
+    public void updateUI() {
+        updatePlayerUI();
+        updatePlaylistUI();
+    }
+
+    private void updatePlayerUI() {
         Media currentMedia = musicPlayerLogic.getCurrentMedia();
         ObservableMap<String, Object> metadata = currentMedia.getMetadata();
         Image image = imageCropSquare((Image)metadata.getOrDefault("image", new Image("/author.png")));
@@ -233,8 +254,52 @@ public class MainController {
         int minPart = secs/60;
         int secPart = secs -  minPart * 60;
         songDuration.setText(String.format("%02d", minPart) + ":" + String.format("%02d", secPart));
+    }
 
-        updatePlayListUIToCurrentSong();
+    public void updatePlaylistUI() {
+        String name = musicPlayerLogic.getPlayListName();
+        playlistName.setText(name);
+
+        int index = musicPlayerLogic.getCurrentSongIndex();
+
+        int itemCount = songContainer.getChildren().size();
+        int songCount = musicPlayerLogic.getMusicFiles().size();
+
+        if (itemCount != songCount) {
+            songContainer.getChildren().clear();
+            for (int i = 0; i < musicPlayerLogic.getMusicFiles().size(); i++) {
+                Pane songComponent = createSongComponent(i);
+                songContainer.getChildren().add(songComponent);
+            }
+        }
+
+        int i = 0;
+        for (Node node : songContainer.getChildren()) {
+            Pane songCard = (Pane) node;
+            songCard.setBorder(null);
+            Button btn_play = (Button)songCard.getChildren().get(0);
+            btn_play.setBackground(bgPlay);
+
+            ObservableMap<String, Object> metadata = musicPlayerLogic.getMediaFiles().get(i).getMetadata();
+            String title = (String) metadata.getOrDefault("title", getNameWithoutExtension(musicPlayerLogic.getMusicFiles().get(i)));
+            String artist = (String) metadata.getOrDefault("artist", "");
+
+            Label titleLabel = (Label)songCard.getChildren().get(1);
+            Label artistLabel = (Label)songCard.getChildren().get(2);
+            titleLabel.setText(title);
+            artistLabel.setText(artist);
+
+            i++;
+        };
+
+        Pane selectedSongCard = (Pane)songContainer.getChildren().get(index);
+        selectedSongCard.setBorder(songCardFocusBorder);
+
+        Button btn_play = (Button)selectedSongCard.getChildren().get(0);
+        btn_play.setPrefSize(35,35);
+        btn_play.setLayoutX(15);
+        btn_play.setLayoutY(15);
+        btn_play.setBackground(bgPause);
     }
 
     public Pane createSongComponent(int songIndex) {
@@ -290,39 +355,7 @@ public class MainController {
     }
 
     public void handleSongSelected(int songIndex) {
-        musicPlayerLogic.playSongByIndex(songIndex, this::updateUIToCurrentSong);
-    }
-
-    public void updatePlayListUIToCurrentSong() {
-        int index = musicPlayerLogic.getCurrentSongIndex();
-
-        int i = 0;
-        for (Node node : songContainer.getChildren()) {
-            Pane songCard = (Pane) node;
-            songCard.setBorder(null);
-            Button btn_play = (Button)songCard.getChildren().get(0);
-            btn_play.setBackground(bgPlay);
-
-            ObservableMap<String, Object> metadata = musicPlayerLogic.getMediaFiles().get(i).getMetadata();
-            String title = (String) metadata.getOrDefault("title", getNameWithoutExtension(musicPlayerLogic.getMusicFiles().get(i)));
-            String artist = (String) metadata.getOrDefault("artist", "");
-
-            Label titleLabel = (Label)songCard.getChildren().get(1);
-            Label artistLabel = (Label)songCard.getChildren().get(2);
-            titleLabel.setText(title);
-            artistLabel.setText(artist);
-
-            i++;
-        };
-
-        Pane selectedSongCard = (Pane)songContainer.getChildren().get(index);
-        selectedSongCard.setBorder(songCardFocusBorder);
-
-        Button btn_play = (Button)selectedSongCard.getChildren().get(0);
-        btn_play.setPrefSize(35,35);
-        btn_play.setLayoutX(15);
-        btn_play.setLayoutY(15);
-        btn_play.setBackground(bgPause);
+        musicPlayerLogic.playSongByIndex(songIndex, this::updateUI);
     }
 
     public String getNameWithoutExtension(File file) {

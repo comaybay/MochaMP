@@ -131,14 +131,19 @@ public class Database {
     private String formatField(String[] fieldValues) {
         String res = "'{";
 
-        boolean first = true;
-        for (String value : fieldValues) {
-            res += (first ? "''" : ", ''") + value + "''";
+        for (int i = 0; i < fieldValues.length; i++) {
+            String value = fieldValues[i];
+            res += (i == 0 ? "\"" : ", \"") + value + "\"";
         }
 
-        return res + "}'";
+        res += "}'";
+        return res.replace("\\", "\\\\");
     }
 
+    /**
+     * thêm bài hát gần đây vào CSDL
+     * @param rps bài hát gần đây
+     */
     public void insertRecentlyPlayedSong(RecentlyPlayedSong rps) {
         try (
             Connection con = createConnection();
@@ -179,6 +184,7 @@ public class Database {
 
     /**
      * thêm playlist vào CSDL
+     * @param pl playlist
      * @return playlist được thêm vào (chứa cả id được gán trong CSDL)
      */
     public Playlist insertPlaylist(Playlist pl) {
