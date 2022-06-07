@@ -63,7 +63,6 @@ public class MainController {
     public Border songCardFocusBorder;
     public Background bgPause;
     public Background bgPlay;
-    public Background bgDot;
 
     public void initialize() throws Exception {
         db = Database.getInstance();
@@ -97,15 +96,10 @@ public class MainController {
                 BackgroundSize.DEFAULT);
         bgPlay = new Background(bgImagePlay);
 
-        Image img_dot = new Image("image/2x/outline_more_vert_white_18dp.png");
-        BackgroundImage bgImageDot = new BackgroundImage(img_dot, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
-                BackgroundSize.DEFAULT);
-        bgDot = new Background(bgImageDot);
-
-        songCardFocusBorder = new Border(new BorderStroke(Color.DARKORCHID,
-                Color.DARKORCHID,
-                Color.DARKORCHID,
-                Color.DARKORCHID,
+        songCardFocusBorder = new Border(new BorderStroke(Color.YELLOW,
+                Color.YELLOW,
+                Color.YELLOW,
+                Color.YELLOW,
                 BorderStrokeStyle.SOLID,
                 BorderStrokeStyle.SOLID,
                 BorderStrokeStyle.SOLID,
@@ -208,18 +202,28 @@ public class MainController {
 
 
     public void onOpenSongs() {
-        musicPlayerLogic.playSongsFromFileChooser(this::updateUI);
+        musicPlayerLogic.addSongsFromFileChooser(this::updateUI);
     }
 
     public void onSavePlaylist() {
         try {
             if (musicPlayerLogic.getMusicFiles().size() > 0) {
-                FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("save-playlist-dialog.fxml"));
-                // Get the Controller from the FXMLLoader
-                DialogPane pane = loader.load();
+                DialogPane pane = null;
 
-                SavePlaylistDialogController controller = loader.getController();
-                controller.setMusicPlayerLogic(musicPlayerLogic);
+                if (musicPlayerLogic.getPlaylistName().isEmpty()) {
+                    FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("save-playlist-dialog.fxml"));
+                    pane = loader.load();
+
+                    SavePlaylistDialogController controller = loader.getController();
+                    controller.setup(musicPlayerLogic, this::updateUI);
+                }
+                else {
+                    FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("update-playlist-dialog.fxml"));
+                    pane = loader.load();
+
+                    UpdatePlaylistDialogController controller = loader.getController();
+                    controller.setup(musicPlayerLogic, this::updateUI);
+                }
 
                 Dialog<ButtonType> dialog = new Dialog<>();
                 dialog.initStyle(StageStyle.UNDECORATED);
@@ -257,7 +261,7 @@ public class MainController {
     }
 
     public void updatePlaylistUI() {
-        String name = musicPlayerLogic.getPlayListName();
+        String name = musicPlayerLogic.getPlaylistName();
         playlistName.setText(name);
 
         int index = musicPlayerLogic.getCurrentSongIndex();
@@ -332,7 +336,8 @@ public class MainController {
         btn_dot.setPrefSize(36,31);
         btn_dot.setLayoutX(243);
         btn_dot.setLayoutY(12);
-        btn_dot.setBackground(bgDot);
+        btn_dot.getStyleClass().add("btn-img");
+        btn_dot.getStyleClass().add("bg-dot");
         //creat pane
         Pane pane = new Pane();
         pane.setPrefSize(200,74);

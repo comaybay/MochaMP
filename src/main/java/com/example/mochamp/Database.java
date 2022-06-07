@@ -205,9 +205,46 @@ public class Database {
         }
     }
 
-    public void deletePlaylist(Playlist pl)  throws SQLException{
-        Connection con = createConnection();
-        Statement stm = con.createStatement();
-        stm.executeUpdate("DELETE FROM playlist WHERE id = " + formatField(Integer.toString(pl.getId())));
+    /**
+     * cập nhật playlist vào CSDL
+     * @param pl playlist
+     */
+    public void updatePlaylist(Playlist pl) {
+        System.out.println(formatField(pl.getSongPaths()));
+        try (Connection con = createConnection();
+             Statement stm = con.createStatement();) {
+            stm.executeUpdate("UPDATE playlists " +
+                    "SET name=" + formatField(pl.getName()) + ","+
+                    "song_paths=" + formatField(pl.getSongPaths()) +
+                    "WHERE id=" + formatField(Integer.toString(pl.getId())) + ";");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deletePlaylist(int id) {
+        try (Connection con = createConnection();
+          Statement stm = con.createStatement();){
+            stm.executeUpdate("DELETE FROM playlists WHERE id = " + formatField(Integer.toString(id)));
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean playlistNameExists(String name) {
+        try (Connection con = createConnection();
+             Statement stm = con.createStatement();
+             ResultSet resultSet = stm.executeQuery("SELECT * FROM playlists WHERE name=" + formatField(name));) {
+
+            if (resultSet.next()) {
+                return true;
+            }
+
+            return false;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return true;
+        }
     }
 }

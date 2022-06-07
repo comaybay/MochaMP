@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SavePlaylistDialogController {
+public class UpdatePlaylistDialogController {
     public TextField playlistField;
     public Label errorLabel;
 
@@ -24,6 +24,7 @@ public class SavePlaylistDialogController {
 
     public void setup(MusicPlayerLogic musicPlayerLogic, Runnable onSuccess) {
         this.musicPlayerLogic = musicPlayerLogic;
+        playlistField.setText(musicPlayerLogic.getPlaylistName());
         onSuccessHandler = onSuccess;
     }
 
@@ -31,25 +32,50 @@ public class SavePlaylistDialogController {
         db = Database.getInstance();
     }
 
-    public void onSave(ActionEvent event) {
+    public void onUpdate(ActionEvent event) {
         List<File> songFiles = musicPlayerLogic.getMusicFiles();
         String[] songPaths = songFiles.stream().map(file -> file.getPath()).collect(Collectors.toList()).toArray(new String[songFiles.size()]);
 
         String playlistName = playlistField.getText().trim();
-        if (playlistName.isBlank()) {
-            errorLabel.setText("*Tên playlist không được trống");
+
+        if (!playlistName.equals(musicPlayerLogic.getPlaylistName()) && !checkValidName(playlistName)) {
             return;
         }
 
-        if (db.playlistNameExists(playlistName)) {
-            errorLabel.setText("*Tên playlist đã tồn tại, vui lòng đặt tên khác");
+        Playlist updatedPlaylist = new Playlist(musicPlayerLogic.getPlaylist().getId(), playlistName, songPaths);
+        db.updatePlaylist(updatedPlaylist);
+        musicPlayerLogic.setPlaylist(updatedPlaylist);
+        onSuccessHandler.run();
+        closeDialog(event);
+    }
+
+    public void onNewPlaylist(ActionEvent event) {
+        List<File> songFiles = musicPlayerLogic.getMusicFiles();
+        String[] songPaths = songFiles.stream().map(file -> file.getPath()).collect(Collectors.toList()).toArray(new String[songFiles.size()]);
+
+        String playlistName = playlistField.getText().trim();
+        if (!checkValidName(playlistName)) {
             return;
         }
 
         Playlist playlist = db.insertPlaylist(new Playlist(-1, playlistName, songPaths));
-        musicPlayerLogic.playSongInPlaylist(playlist, null);
+        musicPlayerLogic.setPlaylist(playlist);
         onSuccessHandler.run();
         closeDialog(event);
+    }
+
+    private boolean checkValidName(String playlistName) {
+        if (playlistName.isBlank()) {
+            errorLabel.setText("*Tên playlist không được trống");
+            return false;
+        }
+
+        if (db.playlistNameExists(playlistName)) {
+            errorLabel.setText("*Tên playlist đã tồn tại, vui lòng đặt tên khác");
+            return false;
+        }
+
+        return true;
     }
 
     public void onCancel(ActionEvent event) {

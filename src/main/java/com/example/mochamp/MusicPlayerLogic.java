@@ -105,15 +105,26 @@ public class MusicPlayerLogic {
      * Lấy tên của playlist
      * @return tên playlist, trả về chuỗi trống nếu chưa mở playlist nào
      */
-    public String getPlayListName() {
+    public String getPlaylistName() {
         return playList == null ? "" : playList.getName();
     }
 
     /**
-    Chơi bài hát từ FileChooser
+     * Lấy playlist
+     * @return playlist, trả về null nếu chưa mở playlist nào
      */
-    public void playSongsFromFileChooser(Runnable onMediaPlayerReady) {
-        playList = null;
+    public Playlist getPlaylist() {
+        return playList;
+    }
+
+    public void setPlaylist(Playlist pl) {
+        playList = pl;
+    }
+
+    /**
+    Thêm bài hát từ FileChooser và chơi bài vừa thêm đầu tiên
+     */
+    public void addSongsFromFileChooser(Runnable onMediaPlayerReady) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Chọn file nhạc");
         fileChooser.getExtensionFilters().add(

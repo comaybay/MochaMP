@@ -66,6 +66,14 @@
     -fx-background-image :url('rps.png');
 }
 
+.bg-dot {
+    -fx-background-image :url('dot.png');
+}
+
+.bg-x {
+    -fx-background-image :url('close.png');
+}
+
 .txt-btn {
     -fx-background-color: -white;
 }
@@ -83,9 +91,18 @@
     -fx-opacity: 0.5;
 }
 
-.btn-img:hover {
+.btn-img:hover, .btn-img-alt:hover {
     -fx-opacity: 0.8;
     -fx-cursor: hand;
+}
+
+.btn-img-alt {
+    -fx-background-position: center, center;
+    -fx-background-size: contain;
+    -fx-background-color: -primary-darker;
+    -fx-background-repeat: no-repeat;
+    -fx-opacity: 0.5;
+    -fx-padding: 3 20 3 20
 }
 
 /*========================*/
