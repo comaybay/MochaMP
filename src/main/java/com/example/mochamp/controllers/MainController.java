@@ -312,6 +312,7 @@ public class MainController {
         btn_play.setLayoutX(15);
         btn_play.setLayoutY(15);
         btn_play.setBackground(bgPlay);
+        btn_play.setPickOnBounds(false);
         //text song
         Label songName = new Label(getNameWithoutExtension(songFile));
         songName.setPrefSize(169,27);
@@ -336,7 +337,16 @@ public class MainController {
         Pane pane = new Pane();
         pane.setPrefSize(200,74);
         pane.getChildren().addAll(btn_play,songName,artist,btn_dot);
-        pane.setOnMouseClicked(e -> handleSongSelected(songIndex));
+        pane.setOnMouseClicked(e -> {
+            if (musicPlayerLogic.getCurrentSongIndex() != songIndex) {
+                handleSongSelected(songIndex);
+                btn_play.setBackground(bgPause);
+            }
+            else {
+                musicPlayerLogic.handleStartStopSong();
+                btn_play.setBackground(btn_play.getBackground() == bgPlay ? bgPause : bgPlay);
+            }
+        });
 
         // wait till metadata is found to set info
         mediaFile.getMetadata().addListener((MapChangeListener<String, Object>) change  -> {
