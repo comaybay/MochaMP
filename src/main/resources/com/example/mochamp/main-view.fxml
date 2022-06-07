@@ -207,7 +207,7 @@
                   </Button>
                </children>
             </Pane>
-            <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="350.0" prefWidth="300.0" style="-fx-fit-to-width: true;" styleClass="panel">
+            <ScrollPane fitToHeight="true" fitToWidth="true"  maxHeight="350.0" styleClass="panel">
                <content>
                   <VBox fx:id="songContainer" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="298.0" style="-fx-view-order: 20;" />
                </content>
