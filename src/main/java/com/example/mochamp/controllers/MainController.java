@@ -400,7 +400,7 @@ public class MainController {
         //button dot
         Button btn_dot = new Button();
         btn_dot.setPrefSize(26,21);
-        btn_dot.setLayoutX(253);
+        btn_dot.setLayoutX(246);
         btn_dot.setLayoutY(24);
         btn_dot.getStyleClass().add("btn-img");
         btn_dot.getStyleClass().add("bg-x");

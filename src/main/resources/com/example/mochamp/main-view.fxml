@@ -217,9 +217,9 @@
                   </Button>
                </children>
             </Pane>
-            <ScrollPane fx:id="playlistScrollPane" fitToHeight="true" fitToWidth="true" maxHeight="350.0" style="-fx-font-size: 1px;" styleClass="panel">
+            <ScrollPane fx:id="playlistScrollPane" hbarPolicy="NEVER" maxHeight="350.0"  style="-fx-font-size: 10px;" styleClass="panel">
                <content>
-                  <VBox fx:id="songContainer" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="298.0" style="-fx-view-order: 20; -fx-font-size: 11;" />
+                  <VBox fx:id="songContainer" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="288.0" style="-fx-view-order: 20; -fx-font-size: 11;" />
                </content>
             </ScrollPane>
             <Pane layoutY="675.0" prefHeight="25.0" prefWidth="300.0" style="-fx-background-radius: 15; -fx-view-order: 10;" styleClass="BlueViolet" />
