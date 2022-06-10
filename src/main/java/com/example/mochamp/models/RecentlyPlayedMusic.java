@@ -1,11 +1,14 @@
 package com.example.mochamp.models;
 
-public class RecentlyPlayedSong {
-    private int id;
-    private String name;
-    private String path;
+/**
+ * Chứa thông tin về nhạc đã chơi gần đây
+ */
+public class RecentlyPlayedMusic {
+    private final int id;
+    private final String name;
+    private final String path;
 
-    public RecentlyPlayedSong(int id, String name, String path) {
+    public RecentlyPlayedMusic(int id, String name, String path) {
         this.id = id;
         this.name = name;
         this.path = path;

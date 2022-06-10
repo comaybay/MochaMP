@@ -1,9 +1,12 @@
 package com.example.mochamp.models;
 
+/**
+ * Chứa thông tin về playlist
+ */
 public class Playlist {
-    private int id;
-    private String name;
-    private String[] songPaths;
+    private final int id;
+    private final String name;
+    private final String[] musicPaths;
 
     public int getId() {
         return id;
@@ -13,13 +16,13 @@ public class Playlist {
         return name;
     }
 
-    public String[] getSongPaths() {
-        return songPaths;
+    public String[] getMusicPaths() {
+        return musicPaths;
     }
 
-    public Playlist(int id, String name, String[] songPaths) {
+    public Playlist(int id, String name, String[] musicPaths) {
         this.id = id;
         this.name = name;
-        this.songPaths = songPaths;
+        this.musicPaths = musicPaths;
     }
 }

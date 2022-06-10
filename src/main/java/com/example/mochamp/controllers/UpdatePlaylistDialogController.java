@@ -14,6 +14,9 @@ import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Dialog để người dùng nhập thông tin cần thiết trước khi cập nhật playlist
+ */
 public class UpdatePlaylistDialogController {
     public TextField playlistField;
     public Label errorLabel;
@@ -33,16 +36,16 @@ public class UpdatePlaylistDialogController {
     }
 
     public void onUpdate(ActionEvent event) {
-        List<File> songFiles = musicPlayerLogic.getMusicFiles();
-        String[] songPaths = songFiles.stream().map(file -> file.getPath()).collect(Collectors.toList()).toArray(new String[songFiles.size()]);
+        List<File> musicFiles = musicPlayerLogic.getMusicFiles();
+        String[] musicPaths = musicFiles.stream().map(File::getPath).collect(Collectors.toList()).toArray(new String[musicFiles.size()]);
 
         String playlistName = playlistField.getText().trim();
 
-        if (!playlistName.equals(musicPlayerLogic.getPlaylistName()) && !checkValidName(playlistName)) {
+        if (!playlistName.equals(musicPlayerLogic.getPlaylistName()) && isNameInvalid(playlistName)) {
             return;
         }
 
-        Playlist updatedPlaylist = new Playlist(musicPlayerLogic.getPlaylist().getId(), playlistName, songPaths);
+        Playlist updatedPlaylist = new Playlist(musicPlayerLogic.getPlaylist().getId(), playlistName, musicPaths);
         db.updatePlaylist(updatedPlaylist);
         musicPlayerLogic.setPlaylist(updatedPlaylist);
         onSuccessHandler.run();
@@ -50,32 +53,32 @@ public class UpdatePlaylistDialogController {
     }
 
     public void onNewPlaylist(ActionEvent event) {
-        List<File> songFiles = musicPlayerLogic.getMusicFiles();
-        String[] songPaths = songFiles.stream().map(file -> file.getPath()).collect(Collectors.toList()).toArray(new String[songFiles.size()]);
+        List<File> musicFiles = musicPlayerLogic.getMusicFiles();
+        String[] musicPaths = musicFiles.stream().map(File::getPath).collect(Collectors.toList()).toArray(new String[musicFiles.size()]);
 
         String playlistName = playlistField.getText().trim();
-        if (!checkValidName(playlistName)) {
+        if (isNameInvalid(playlistName)) {
             return;
         }
 
-        Playlist playlist = db.insertPlaylist(new Playlist(-1, playlistName, songPaths));
+        Playlist playlist = db.insertPlaylist(new Playlist(-1, playlistName, musicPaths));
         musicPlayerLogic.setPlaylist(playlist);
         onSuccessHandler.run();
         closeDialog(event);
     }
 
-    private boolean checkValidName(String playlistName) {
+    private boolean isNameInvalid(String playlistName) {
         if (playlistName.isBlank()) {
             errorLabel.setText("*Tên playlist không được trống");
-            return false;
+            return true;
         }
 
         if (db.playlistNameExists(playlistName)) {
             errorLabel.setText("*Tên playlist đã tồn tại, vui lòng đặt tên khác");
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     public void onCancel(ActionEvent event) {

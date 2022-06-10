@@ -8,25 +8,24 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.io.IOException;
+import java.util.Objects;
 
-public class HelloApplication extends Application {
+public class MochaMPApplication extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("main-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource("main-view.fxml"));
 
         Parent root = fxmlLoader.load();
 
-        root.setOnMousePressed(pressEvent -> {
-            root.setOnMouseDragged(dragEvent -> {
-                stage.setX(dragEvent.getScreenX() - pressEvent.getSceneX());
-                stage.setY(dragEvent.getScreenY() - pressEvent.getSceneY());
-            });
-        });
+        // cho phép kéo thả màn hình chương trình
+        root.setOnMousePressed(pressEvent -> root.setOnMouseDragged(dragEvent -> {
+            stage.setX(dragEvent.getScreenX() - pressEvent.getSceneX());
+            stage.setY(dragEvent.getScreenY() - pressEvent.getSceneY());
+        }));
 
         Scene scene = new Scene(root);
 
-        String css = this.getClass().getClassLoader().getResource("style.css").toExternalForm();
+        String css = Objects.requireNonNull(this.getClass().getClassLoader().getResource("style.css")).toExternalForm();
         scene.getStylesheets().add(css);
 
         scene.setFill(Color.TRANSPARENT);

@@ -16,24 +16,6 @@
     -fx-background-color: linear-gradient(to bottom, -primary, -primary-dark);
 }
 
-.slider .track {
-    -fx-background-radius: 0;
-    -fx-background-color: -primary-darker;
-    -fx-pref-height: 12px;
-}
-
-.slider .thumb {
-    -fx-background-color: linear-gradient(to right, -accent, -accent-bright);
-    -fx-background-radius: 0;
-    -fx-pref-width: 3px;
-    -fx-pref-height: 12px;
-}
-
-.scroll-pane > .viewport{
-   -fx-background-color: -primary;
-}
-
-
 .bg-shuffle {
     -fx-background-image: url('shuffle.png');
 }
@@ -109,58 +91,23 @@
     -fx-padding: 3 20 3 20
 }
 
-/*========================*/
+/* ===================== */
 
-.red {
-    color: #ff0000;
-    -fx-background-color: #ff0000;
-    }
-.green {
-    color: #00ff00;
-    -fx-background-color: #00ff00;
-}
-.blue {
-    color: #0000ff;
-    -fx-background-color: blue;
-}
-.plum {
-    -fx-background-color: Plum;
-}
-.purple {
-    -fx-background-color: Purple;
-}
-.BlueViolet {
-    border-radius: 10px;
-    -fx-background-color: linear-gradient(to bottom, -primary, -primary-dark);
+.slider .track {
+    -fx-background-radius: 0;
+    -fx-background-color: -primary-darker;
+    -fx-pref-height: 12px;
 }
 
-.Shuffle {
-    -fx-background-image: url('shuffle.png');
-    -fx-background-position: center, center;
-    -fx-background-size: contain;
-    -fx-background-color: transparent;
-    -fx-background-repeat: no-repeat;
-    -fx-opacity: 0.5;
+.slider .thumb {
+    -fx-background-color: linear-gradient(to right, -accent, -accent-bright);
+    -fx-background-radius: 0;
+    -fx-pref-width: 3px;
+    -fx-pref-height: 12px;
 }
 
-.Shuffle:hover {
-    -fx-opacity: 0.8;
-}
-
-.Play {
-    -fx-background-image :url('image/2x/outline_play_circle_filled_white_18dp.png');
-}
-
-.playing_song_border {
-    -fx-border-color: DarkOrchid;
-    -fx-border-radius: 10;
-    -fx-border-width: 3;
-}
-.Pause_18 {
-    -fx-background-image :url('image/2x/outline_pause_circle_filled_white_18dp.png');
-}
-.dot {
-    -fx-background-image :url('image/2x/outline_more_vert_white_18dp.png');
+.scroll-pane > .viewport{
+   -fx-background-color: -primary;
 }
 
 .dialog-pane:header .header-panel .label {
@@ -172,41 +119,4 @@
 .dialog-pane:header .header-panel{
     -fx-background-color: transparent;
     -fx-padding: 5 5;
-}
-
-.white {
-    -fx-background-color: White;
-}
-.black {
-    -fx-background-color: Black;
-}
-.black {
-    -fx-background-color: Black;
-}
-.indigo {
-    -fx-background-color: Indigo;
-}
-.slateblue {
-    -fx-background-color: SlateBlue;
-}
-.orchid {
-    -fx-background-color: Orchid;
-}
-.mediumPurple {
-    -fx-background-color: MediumPurple;
-}
-.mediumOrchid {
-    -fx-background-color: MediumOrchid;
-}
-.none {
-    -fx-background-color: none;
-}
-.DarkOrchid {
-    -fx-background-color: DarkOrchid;
-}
-.DarkViolet {
-    -fx-background-color: DarkViolet;
-}
-.DarkSlateBlue {
-    -fx-background-color: DarkSlateBlue;
 }

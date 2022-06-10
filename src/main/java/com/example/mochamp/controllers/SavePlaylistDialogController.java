@@ -14,6 +14,9 @@ import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Dialog để người dùng nhập thông tin cần thiết trước khi lưu playlist
+ */
 public class SavePlaylistDialogController {
     public TextField playlistField;
     public Label errorLabel;
@@ -32,8 +35,8 @@ public class SavePlaylistDialogController {
     }
 
     public void onSave(ActionEvent event) {
-        List<File> songFiles = musicPlayerLogic.getMusicFiles();
-        String[] songPaths = songFiles.stream().map(file -> file.getPath()).collect(Collectors.toList()).toArray(new String[songFiles.size()]);
+        List<File> musicFiles = musicPlayerLogic.getMusicFiles();
+        String[] musicPaths = musicFiles.stream().map(File::getPath).collect(Collectors.toList()).toArray(new String[musicFiles.size()]);
 
         String playlistName = playlistField.getText().trim();
         if (playlistName.isBlank()) {
@@ -46,8 +49,8 @@ public class SavePlaylistDialogController {
             return;
         }
 
-        Playlist playlist = db.insertPlaylist(new Playlist(-1, playlistName, songPaths));
-        musicPlayerLogic.playSongInPlaylist(playlist, null);
+        Playlist playlist = db.insertPlaylist(new Playlist(-1, playlistName, musicPaths));
+        musicPlayerLogic.playMusicInPlaylist(playlist, null);
         onSuccessHandler.run();
         closeDialog(event);
     }

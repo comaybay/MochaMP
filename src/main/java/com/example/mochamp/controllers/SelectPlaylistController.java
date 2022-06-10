@@ -15,6 +15,9 @@ import javafx.stage.Stage;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+/**
+ * popup chọn playlist đã lưu
+ */
 public class SelectPlaylistController {
     public VBox container;
 
@@ -53,7 +56,7 @@ public class SelectPlaylistController {
 
             hBox.getChildren().addAll(item, deleteBtn);
             container.getChildren().add(hBox);
-        };
+        }
     }
 
     private void closeDialog(ActionEvent event) {

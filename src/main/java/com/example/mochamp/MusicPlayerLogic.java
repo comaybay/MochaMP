@@ -1,7 +1,7 @@
 package com.example.mochamp;
 
 import com.example.mochamp.models.Playlist;
-import com.example.mochamp.models.RecentlyPlayedSong;
+import com.example.mochamp.models.RecentlyPlayedMusic;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -23,15 +23,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Chứa các tính năng liên quan đến việc tương tác với nhạc, playlist và media player
+ */
 public class MusicPlayerLogic {
     private List<File> musicFiles;
-    private List<Media> mediaFiles;
-    private Database db;
+    private List<Media> musicMediaFiles;
+    private final Database db;
     private File currentMusicFile;
     private MediaPlayer mediaPlayer;
     private boolean playing = false;
     private Playlist playList = null;
-    private Timeline progressBarTimeline = null;
+    private final Timeline progressBarTimeline;
 
     public boolean isLoopOne() {
         return loopOne;
@@ -44,32 +47,34 @@ public class MusicPlayerLogic {
     private boolean loopOne = false;
     private boolean loopAll = false;
 
-    private HBox root;
-    private Label songCurrentTime;
+    private final HBox root;
+    private final Label musicCurrentTime;
     public ImageView thumbnail;
-    private Slider progressBar;
-    private ImageView startStopImage;
+    private final Slider progressBar;
+    private final ImageView startStopImage;
 
     public MusicPlayerLogic(
-            HBox root, Label songTitle, Label songDuration, Label songCurrentTime, ImageView thumbnail,
-            Slider progressBar, StackPane startStopButton, ImageView startStopImage,
-            Button openSongsButton, VBox songContainer
+            HBox root, Label musicCurrentTime, ImageView thumbnail,
+            Slider progressBar, ImageView startStopImage
     ) throws Exception {
         this.db = Database.getInstance();
 
-        this.songCurrentTime = songCurrentTime;
+        this.musicCurrentTime = musicCurrentTime;
         this.progressBar = progressBar;
         this.startStopImage = startStopImage;
         this.root = root;
         this.thumbnail = thumbnail;
 
         musicFiles = new ArrayList<>();
-        mediaFiles = new ArrayList<>();
+        musicMediaFiles = new ArrayList<>();
         progressBarTimeline = createProgressBarTimeline();
     }
 
+    /**
+     * Setup tính năng của thanh thời lượng nhạc
+     */
     public void useProgressBarLogic() {
-        progressBar.setOnMousePressed(e -> seekMusic(e));
+        progressBar.setOnMousePressed(this::seekMusic);
         progressBar.setOnDragDetected(e -> progressBarTimeline.pause());
         progressBar.setOnMouseReleased(e -> { seekMusic(e); prevX = -9999; progressBarTimeline.playFromStart(); });
     }
@@ -78,7 +83,7 @@ public class MusicPlayerLogic {
      * chạy/dừng nhạc và sửa UI.
      * @return boolean đang chơi hay đang dừng nhạc
      */
-    public boolean handleStartStopSong() {
+    public boolean handleStartStopMusic() {
         if (mediaPlayer == null)
             return false;
 
@@ -124,9 +129,14 @@ public class MusicPlayerLogic {
         playList = pl;
     }
 
-    public MediaPlayer getMediaPlayer() { return mediaPlayer; }
+    public MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
+    }
 
-    public void clearAllSongs() {
+    /**
+     * Xóa hết nhạc khỏi hàng chờ nhạc
+     */
+    public void clearAllMusicFromQueue() {
         if (mediaPlayer != null) {
             mediaPlayer.stop();
             mediaPlayer = null;
@@ -137,13 +147,13 @@ public class MusicPlayerLogic {
         progressBar.setDisable(true);
 
         musicFiles.clear();
-        mediaFiles.clear();
+        musicMediaFiles.clear();
     }
 
     /**
-    Thêm bài hát từ FileChooser và chơi bài vừa thêm đầu tiên
+     * Thêm nhạc từ FileChooser và chơi bài vừa thêm đầu tiên
      */
-    public void addSongsFromFileChooser(Runnable onMediaPlayerReady) {
+    public void addMusicFromFileChooser(Runnable onMediaPlayerReady) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Chọn file nhạc");
         fileChooser.getExtensionFilters().add(
@@ -162,16 +172,20 @@ public class MusicPlayerLogic {
         musicFiles.addAll(selectedFiles);
 
         for (File file: selectedFiles) {
-            mediaFiles.add(new Media(file.toURI().toString()));
+            musicMediaFiles.add(new Media(file.toURI().toString()));
         }
 
         if (selectedFiles.size() != 0) {
-            playSongByIndex(prevPlaylistLength, onMediaPlayerReady);
+            playMusicByIndex(prevPlaylistLength, onMediaPlayerReady);
         }
     }
 
-    public void removeSongFromQueue(int songIndex) {
-        if (getCurrentSongIndex() == songIndex) {
+    /**
+     * Xóa nhạc khỏi hàng chờ nhạc
+     * @param musicIndex index của nhạc muốn xóa
+     */
+    public void removeMusicFromQueue(int musicIndex) {
+        if (getCurrentMusicIndex() == musicIndex) {
             mediaPlayer.stop();
             mediaPlayer = null;
 
@@ -180,36 +194,46 @@ public class MusicPlayerLogic {
             progressBar.setDisable(true);
         }
 
-        musicFiles.remove(songIndex);
-        mediaFiles.remove(songIndex);
+        musicFiles.remove(musicIndex);
+        musicMediaFiles.remove(musicIndex);
     }
 
     public List<File> getMusicFiles() {
         return musicFiles;
     }
 
-    public List<Media> getMediaFiles() {
-        return mediaFiles;
+    public List<Media> getMusicMediaFiles() {
+        return musicMediaFiles;
     }
 
-    public Media getCurrentSongMedia() {
+    public Media getCurrentMusicMedia() {
         return mediaPlayer == null ? null : mediaPlayer.getMedia();
     }
 
-    public int getCurrentSongIndex() {
-        return mediaFiles.indexOf(getCurrentSongMedia());
+    public int getCurrentMusicIndex() {
+        return musicMediaFiles.indexOf(getCurrentMusicMedia());
     }
 
-    public File getCurrentMusicFile() { return currentMusicFile; }
+    public File getCurrentMusicFile() {
+        return currentMusicFile;
+    }
 
-    public void stopCurrentSong() {
+    /**
+     * Dừng nhạc đang chơi
+     */
+    public void pauseCurrentMusic() {
         if (mediaPlayer != null) {
             mediaPlayer.pause();
             progressBarTimeline.pause();
         }
     }
 
-    public void playRecentlyPlayedSong(RecentlyPlayedSong rps, Runnable onMediaPlayerReady) {
+    /**
+     * Chơi nhạc gần đây. Xóa hàng chờ và thêm nhạc gần đây vào hàng chờ
+     * @param rps nhạc gần đây
+     * @param onMediaPlayerReady callback khi media file sẵn sàng
+     */
+    public void playRecentlyPlayedMusic(RecentlyPlayedMusic rps, Runnable onMediaPlayerReady) {
         playList = null;
         File file = new File(rps.getPath());
 
@@ -220,35 +244,48 @@ public class MusicPlayerLogic {
             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
             alert.setTitle("Không tìm thấy file nhạc");
             alert.showAndWait();
-            db.deleteRecentlyPlayedSongById(rps.getId());
+            db.deleteRecentlyPlayedMusicById(rps.getId());
             return;
         }
 
         musicFiles.clear();
         musicFiles.add(file);
 
-        mediaFiles.clear();
-        mediaFiles.add(new Media(file.toURI().toString()));
+        musicMediaFiles.clear();
+        musicMediaFiles.add(new Media(file.toURI().toString()));
 
-        playSongByIndex(0, onMediaPlayerReady);
+        playMusicByIndex(0, onMediaPlayerReady);
 
         //move rps to top of list
-        db.deleteRecentlyPlayedSongById(rps.getId());
-        db.insertRecentlyPlayedSong(rps);
+        db.deleteRecentlyPlayedMusicById(rps.getId());
+        db.insertRecentlyPlayedMusic(rps);
     }
 
-    public void playNextSong(Runnable onMediaPlayerReady) {
-        int index = Math.min(mediaFiles.indexOf(getCurrentSongMedia()) + 1, mediaFiles.size() - 1) ;
-        playSongByIndex(index, onMediaPlayerReady);
+    /**
+     * Chơi nhạc tiếp theo
+     * @param onMediaPlayerReady callback khi media file sẵn sàng
+     */
+    public void playNextMusic(Runnable onMediaPlayerReady) {
+        int index = Math.min(musicMediaFiles.indexOf(getCurrentMusicMedia()) + 1, musicMediaFiles.size() - 1) ;
+        playMusicByIndex(index, onMediaPlayerReady);
     }
 
-    public void playPrevSong(Runnable onMediaPlayerReady) {
-        int index = Math.max(mediaFiles.indexOf(getCurrentSongMedia()) - 1, 0);
-        playSongByIndex(index, onMediaPlayerReady);
+    /**
+     * Chơi nhạc trước đó
+     * @param onMediaPlayerReady callback khi media file sẵn sàng
+     */
+    public void playPrevMusic(Runnable onMediaPlayerReady) {
+        int index = Math.max(musicMediaFiles.indexOf(getCurrentMusicMedia()) - 1, 0);
+        playMusicByIndex(index, onMediaPlayerReady);
     }
 
-    public void playSongByIndex(int index, Runnable onMediaPlayerReady) {
-        if (mediaFiles.size() == 0) {
+    /**
+     * Chơi nhạc trong hàng chờ thông qua index của nhạc
+     * @param index index của nhạc trong hàng chờ
+     * @param onMediaPlayerReady callback khi media file sẵn sàng
+     */
+    public void playMusicByIndex(int index, Runnable onMediaPlayerReady) {
+        if (musicMediaFiles.size() == 0) {
             return;
         }
 
@@ -257,20 +294,20 @@ public class MusicPlayerLogic {
 
         currentMusicFile = musicFiles.get(index);
 
-        stopCurrentSong();
+        pauseCurrentMusic();
 
-        mediaPlayer = new MediaPlayer(mediaFiles.get(index));
+        mediaPlayer = new MediaPlayer(musicMediaFiles.get(index));
         progressBar.setDisable(false);
         progressBarTimeline.playFromStart();
         mediaPlayer.play();
 
         mediaPlayer.setOnReady(() -> {
-            db.deleteRecentlyPlayedSongByPath(currentMusicFile.getPath());
+            db.deleteRecentlyPlayedMusicByPath(currentMusicFile.getPath());
 
-            ObservableMap<String, Object> metadata = getCurrentSongMedia().getMetadata();
-            db.insertRecentlyPlayedSong(new RecentlyPlayedSong(
+            ObservableMap<String, Object> metadata = getCurrentMusicMedia().getMetadata();
+            db.insertRecentlyPlayedMusic(new RecentlyPlayedMusic(
                 -1,
-                (String) metadata.getOrDefault("title", getNameWithoutExtension(currentMusicFile)),
+                (String) metadata.getOrDefault("title", Utils.getNameWithoutExtension(currentMusicFile)),
                 currentMusicFile.getPath()
             ));
 
@@ -280,57 +317,66 @@ public class MusicPlayerLogic {
         });
 
         mediaPlayer.setOnEndOfMedia(() -> {
-            mediaPlayer.seek(Duration.ZERO);
-            mediaPlayer.stop();
-            handleStartStopSong();
-
             if (loopOne) {
                 mediaPlayer.seek(Duration.ZERO);
                 mediaPlayer.play();
                 return;
             }
 
-            if (getCurrentSongIndex() < mediaFiles.size() - 1) {
-                playNextSong(onMediaPlayerReady);
+            if (getCurrentMusicIndex() < musicMediaFiles.size() - 1) {
+                playNextMusic(onMediaPlayerReady);
                 return;
             }
 
             if (loopAll) {
-                playSongByIndex(0, onMediaPlayerReady);
-                return;
+                playMusicByIndex(0, onMediaPlayerReady);
+            }
+            else {
+                mediaPlayer.seek(Duration.ZERO);
+                mediaPlayer.stop();
+                handleStartStopMusic();
             }
         });
     }
 
+    /**
+     * chuyển thanh thời lượng về trạng thái vô định
+     */
     private void setProgressBarToZero() {
         progressBar.setValue(0);
-        songCurrentTime.setText("00:00");
+        musicCurrentTime.setText("00:00");
     }
 
+    /**
+     * Tạo timeline cho thanh thời lượng (cập nhật UI thanh theo thời gian nhạc đang chơi)
+     * @return timeline
+     */
     private Timeline createProgressBarTimeline() {
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), ev -> {
-            progressBar.setValue((mediaPlayer.getCurrentTime().toSeconds() / getCurrentSongMedia().getDuration().toSeconds()) * 100);
+            progressBar.setValue((mediaPlayer.getCurrentTime().toSeconds() / getCurrentMusicMedia().getDuration().toSeconds()) * 100);
 
             int secs = (int) Math.round(mediaPlayer.getCurrentTime().toSeconds());
             int minPart = secs/60;
             int secPart = secs -  minPart * 60;
-            songCurrentTime.setText(String.format("%02d", minPart) + ":" + String.format("%02d", secPart));
+            musicCurrentTime.setText(String.format("%02d", minPart) + ":" + String.format("%02d", secPart));
         }));
         timeline.setCycleCount(Animation.INDEFINITE);
         return timeline;
     }
 
-    private String getNameWithoutExtension(File file) {
-        return file.getName().replaceFirst("[.][^.]+$", "");
-    }
 
     private long prevX;
+
+    /**
+     * Seek nhạc theo con trỏ chuột
+     * @param e event của con trỏ chuột
+     */
     private void seekMusic(MouseEvent e) {
-        if (getCurrentSongMedia() == null) {
+        if (getCurrentMusicMedia() == null) {
             return;
         }
 
-        double time = (e.getX() / progressBar.getWidth()) * getCurrentSongMedia().getDuration().toSeconds();
+        double time = (e.getX() / progressBar.getWidth()) * getCurrentMusicMedia().getDuration().toSeconds();
 
         if (Math.round(e.getX()) == prevX) {
             return;
@@ -340,15 +386,20 @@ public class MusicPlayerLogic {
         mediaPlayer.seek(Duration.seconds(time));
     }
 
-    public void playSongInPlaylist(Playlist playlist, Runnable onMediaPlayerReady) {
+    /**
+     * Đưa nhạc từ playlist vào hàng chờ và chơi bài đầu tiên trong playlist
+     * @param playlist playlist muốn chơi
+     * @param onMediaPlayerReady callback khi media file sẵn sàng
+     */
+    public void playMusicInPlaylist(Playlist playlist, Runnable onMediaPlayerReady) {
         playList = playlist;
-        musicFiles = Arrays.stream(playlist.getSongPaths()).map(File::new)
+        musicFiles = Arrays.stream(playlist.getMusicPaths()).map(File::new)
                                                            .filter(File::exists)
                                                            .collect(Collectors.toList());
 
-        mediaFiles = musicFiles.stream().map(f -> new Media(f.toURI().toString()))
+        musicMediaFiles = musicFiles.stream().map(f -> new Media(f.toURI().toString()))
                                         .collect(Collectors.toList());
 
-        playSongByIndex(0, onMediaPlayerReady);
+        playMusicByIndex(0, onMediaPlayerReady);
     }
 }

@@ -2,9 +2,8 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.control.ScrollPane?>
 
-<AnchorPane prefWidth="200.0" styleClass="dialog-panel" stylesheets="@../../../style.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.mochamp.controllers.SelectRecentlyPlayedSongController">
+<AnchorPane prefWidth="200.0" styleClass="dialog-panel" stylesheets="@../../../style.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.mochamp.controllers.SelectRecentlyPlayedMusicController">
     <VBox fx:id="container" style="-fx-background-color: -white;">
       <padding>
          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
