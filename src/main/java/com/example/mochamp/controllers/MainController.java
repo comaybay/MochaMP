@@ -27,6 +27,7 @@ import javafx.stage.StageStyle;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Function;
 
 public class MainController {
     private Database db;
@@ -161,19 +162,21 @@ public class MainController {
             musicPlayerLogic.playSongByIndex(0, this::updateUI);
         });
 
+        Function<Boolean, String> getOpacityStyle = hovered -> "-fx-opacity: " + (hovered ? "1" : "0.5");
+
         loopAllButton.setOnAction(e ->  {
             boolean isLoopAll = musicPlayerLogic.toggleLoopAll();
-            loopAllButton.setStyle("-fx-opacity: " + (isLoopAll ? "1" : "0.5"));
+            loopAllButton.setStyle(getOpacityStyle.apply(isLoopAll));
         });
         loopAllButton.setOnMouseEntered(e -> loopAllButton.setStyle("-fx-opacity: 0.8"));
-        loopAllButton.setOnMouseExited(e -> loopAllButton.setStyle("-fx-opacity: " + (musicPlayerLogic.isLoopAll() ? "1" : "0.5")));
+        loopAllButton.setOnMouseExited(e -> loopAllButton.setStyle(getOpacityStyle.apply(musicPlayerLogic.isLoopAll())));
 
         loopOneButton.setOnAction(e -> {
             boolean isLoopOne = musicPlayerLogic.toggleLoopOne();
-            loopOneButton.setStyle("-fx-opacity: " + (isLoopOne ? "1" : "0.5"));
+            loopOneButton.setStyle(getOpacityStyle.apply(isLoopOne));
         });
         loopOneButton.setOnMouseEntered(e -> loopOneButton.setStyle("-fx-opacity: 0.8"));
-        loopOneButton.setOnMouseExited(e -> loopOneButton.setStyle("-fx-opacity: " + (musicPlayerLogic.isLoopOne() ? "1" : "0.5")));
+        loopOneButton.setOnMouseExited(e -> loopOneButton.setStyle(getOpacityStyle.apply(musicPlayerLogic.isLoopOne())));
 
         clearAllSongsButton.setOnAction(e -> {
             if (musicPlayerLogic.getMusicFiles().size() == 0) {
