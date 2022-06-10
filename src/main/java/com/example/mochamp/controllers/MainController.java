@@ -18,6 +18,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
@@ -54,15 +55,17 @@ public class MainController {
     public Button shuffleSongsButton;
     public Button loopAllButton;
     public Button loopOneButton;
+    public Button clearAllSongsButton;
     public Pane menu;
-    public Label text;
+    public ScrollPane playlistScrollPane;
     public VBox songContainer;
     public VBox playlist;
     public Label playlistName;
 
-    public Border songCardFocusBorder;
-    public Background bgPause;
-    public Background bgPlay;
+    private Border songCardFocusBorder;
+    private Background bgPause;
+    private Background bgPlay;
+    private Pane selectedSongCard;
 
     public void initialize() throws Exception {
         db = Database.getInstance();
@@ -109,7 +112,12 @@ public class MainController {
 
         startStopButton.setOnMouseClicked(e -> {
             if (e.getTarget() != startStopButton) {
-                musicPlayerLogic.handleStartStopSong();
+                boolean state = musicPlayerLogic.handleStartStopSong();
+
+                if (selectedSongCard != null) {
+                    Button btn = (Button)selectedSongCard.getChildren().get(0);
+                    btn.setBackground(state ? bgPause : bgPlay);
+                }
             }
         });
 
@@ -167,6 +175,24 @@ public class MainController {
         loopOneButton.setOnMouseEntered(e -> loopOneButton.setStyle("-fx-opacity: 0.8"));
         loopOneButton.setOnMouseExited(e -> loopOneButton.setStyle("-fx-opacity: " + (musicPlayerLogic.isLoopOne() ? "1" : "0.5")));
 
+        clearAllSongsButton.setOnAction(e -> {
+            if (musicPlayerLogic.getMusicFiles().size() == 0) {
+                return;
+            }
+
+            ButtonType okBtn = new ButtonType("Xóa", ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancelBtn = new ButtonType("Hủy", ButtonBar.ButtonData.CANCEL_CLOSE);
+            Alert alert = new Alert(Alert.AlertType.NONE,"Xóa hết bài hát khỏi hàng chờ nhạc?", okBtn, cancelBtn);
+
+            alert.setTitle("Xóa hết bài hát");
+            Optional<ButtonType> result = alert.showAndWait();
+
+            if (result.orElse(cancelBtn) == okBtn) {
+                musicPlayerLogic.clearAllSongs();
+                updateUI();
+            }
+        });
+
         musicPlayerLogic.useProgressBarLogic();
     }
 
@@ -194,12 +220,19 @@ public class MainController {
         AnchorPane pane = loader.load();
 
         SelectPlaylistController controller = loader.getController();
-        controller.setOnClickItem(playlist -> musicPlayerLogic.playSongInPlaylist(playlist, this::updateUI));
-
+        controller.setup(
+                playlist -> musicPlayerLogic.playSongInPlaylist(playlist, this::updateUI),
+                playlist -> {
+                    if (musicPlayerLogic.getPlaylist() != null &&
+                            playlist.getId() == musicPlayerLogic.getPlaylist().getId()) {
+                        musicPlayerLogic.setPlaylist(null);
+                        musicPlayerLogic.clearAllSongs();
+                        updateUI();
+                    }
+                });
         Utils.setupPopupPane(pane, selectPlaylistButton)
              .show();
     }
-
 
     public void onOpenSongs() {
         musicPlayerLogic.addSongsFromFileChooser(this::updateUI);
@@ -244,7 +277,17 @@ public class MainController {
     }
 
     private void updatePlayerUI() {
-        Media currentMedia = musicPlayerLogic.getCurrentMedia();
+        Media currentMedia = musicPlayerLogic.getCurrentSongMedia();
+
+        if (currentMedia == null) {
+            Image image = imageCropSquare(new Image("/author.png"));
+            thumbnail.setImage(image);
+            songTitle.setText("");
+            songArtist.setText("");
+            songDuration.setText("00:00");
+            return;
+        }
+
         ObservableMap<String, Object> metadata = currentMedia.getMetadata();
         Image image = imageCropSquare((Image)metadata.getOrDefault("image", new Image("/author.png")));
         thumbnail.setImage(image);
@@ -264,8 +307,6 @@ public class MainController {
         String name = musicPlayerLogic.getPlaylistName();
         playlistName.setText(name);
 
-        int index = musicPlayerLogic.getCurrentSongIndex();
-
         int itemCount = songContainer.getChildren().size();
         int songCount = musicPlayerLogic.getMusicFiles().size();
 
@@ -275,6 +316,10 @@ public class MainController {
                 Pane songComponent = createSongComponent(i);
                 songContainer.getChildren().add(songComponent);
             }
+        }
+
+        if (songCount == 0) {
+            return;
         }
 
         int i = 0;
@@ -296,14 +341,34 @@ public class MainController {
             i++;
         };
 
-        Pane selectedSongCard = (Pane)songContainer.getChildren().get(index);
-        selectedSongCard.setBorder(songCardFocusBorder);
+        int currentSongIndex = musicPlayerLogic.getCurrentSongIndex();
+        if (currentSongIndex >= 0) {
+            selectedSongCard = (Pane)songContainer.getChildren().get(currentSongIndex);
+            selectedSongCard.setBorder(songCardFocusBorder);
 
-        Button btn_play = (Button)selectedSongCard.getChildren().get(0);
-        btn_play.setPrefSize(35,35);
-        btn_play.setLayoutX(15);
-        btn_play.setLayoutY(15);
-        btn_play.setBackground(bgPause);
+            Button btn_play = (Button)selectedSongCard.getChildren().get(0);
+            btn_play.setPrefSize(35,35);
+            btn_play.setLayoutX(15);
+            btn_play.setLayoutY(15);
+            btn_play.setBackground(bgPause);
+
+            MediaPlayer mediaPlayer = musicPlayerLogic.getMediaPlayer();
+            Runnable handler = mediaPlayer.getOnEndOfMedia();
+
+            mediaPlayer.setOnEndOfMedia(() -> {
+                handler.run();
+                btn_play.setBackground(bgPlay);
+
+                mediaPlayer.setOnPlaying(() -> {
+                    btn_play.setBackground(bgPause);
+                    mediaPlayer.setOnPlaying(null);
+                });
+            });
+
+            //run later để chạy sau khi các thẻ bài hát đã được render ra hết
+            //bỏ qua 2 bài đầu để bài hát đang chơi nằm ở giữa
+            Platform.runLater(() -> playlistScrollPane.setVvalue(currentSongIndex / (songCount - 1.0f - 2)));
+        }
     }
 
     public Pane createSongComponent(int songIndex) {
@@ -317,6 +382,7 @@ public class MainController {
         btn_play.setLayoutY(15);
         btn_play.setBackground(bgPlay);
         btn_play.setPickOnBounds(false);
+
         //text song
         Label songName = new Label(getNameWithoutExtension(songFile));
         songName.setPrefSize(169,27);
@@ -333,11 +399,25 @@ public class MainController {
         artist.setTextFill(Color.WHITE);
         //button dot
         Button btn_dot = new Button();
-        btn_dot.setPrefSize(36,31);
-        btn_dot.setLayoutX(243);
-        btn_dot.setLayoutY(12);
+        btn_dot.setPrefSize(26,21);
+        btn_dot.setLayoutX(253);
+        btn_dot.setLayoutY(24);
         btn_dot.getStyleClass().add("btn-img");
-        btn_dot.getStyleClass().add("bg-dot");
+        btn_dot.getStyleClass().add("bg-x");
+        btn_dot.setOnAction(e -> {
+            ButtonType okBtn = new ButtonType("Xóa", ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancelBtn = new ButtonType("Hủy", ButtonBar.ButtonData.CANCEL_CLOSE);
+            Alert alert = new Alert(Alert.AlertType.NONE,"Xóa bài này khỏi hàng chờ nhạc? (" + songName.getText() + ")", okBtn, cancelBtn);
+
+            alert.setTitle("Xóa playlist");
+            Optional<ButtonType> result = alert.showAndWait();
+
+            if (result.orElse(cancelBtn) == okBtn) {
+                musicPlayerLogic.removeSongFromQueue(songIndex);
+                updateUI();
+            }
+        });
+
         //creat pane
         Pane pane = new Pane();
         pane.setPrefSize(200,74);

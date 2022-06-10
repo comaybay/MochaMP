@@ -6,9 +6,7 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.ObservableMap;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -29,7 +27,6 @@ public class MusicPlayerLogic {
     private List<File> musicFiles;
     private List<Media> mediaFiles;
     private Database db;
-    private Media currentMedia;
     private File currentMusicFile;
     private MediaPlayer mediaPlayer;
     private boolean playing = false;
@@ -77,9 +74,13 @@ public class MusicPlayerLogic {
         progressBar.setOnMouseReleased(e -> { seekMusic(e); prevX = -9999; progressBarTimeline.playFromStart(); });
     }
 
-    public void handleStartStopSong() {
+    /**
+     * chạy/dừng nhạc và sửa UI.
+     * @return boolean đang chơi hay đang dừng nhạc
+     */
+    public boolean handleStartStopSong() {
         if (mediaPlayer == null)
-            return;
+            return false;
 
         playing = !playing;
         Image image = playing ? new Image("/pause.png") : new Image("/play.png");
@@ -89,6 +90,8 @@ public class MusicPlayerLogic {
             mediaPlayer.play();
         else
             mediaPlayer.pause();
+
+        return playing;
     }
 
     public boolean toggleLoopAll() {
@@ -121,6 +124,22 @@ public class MusicPlayerLogic {
         playList = pl;
     }
 
+    public MediaPlayer getMediaPlayer() { return mediaPlayer; }
+
+    public void clearAllSongs() {
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer = null;
+        }
+
+        progressBarTimeline.stop();
+        setProgressBarToZero();
+        progressBar.setDisable(true);
+
+        musicFiles.clear();
+        mediaFiles.clear();
+    }
+
     /**
     Thêm bài hát từ FileChooser và chơi bài vừa thêm đầu tiên
      */
@@ -151,6 +170,20 @@ public class MusicPlayerLogic {
         }
     }
 
+    public void removeSongFromQueue(int songIndex) {
+        if (getCurrentSongIndex() == songIndex) {
+            mediaPlayer.stop();
+            mediaPlayer = null;
+
+            progressBarTimeline.stop();
+            setProgressBarToZero();
+            progressBar.setDisable(true);
+        }
+
+        musicFiles.remove(songIndex);
+        mediaFiles.remove(songIndex);
+    }
+
     public List<File> getMusicFiles() {
         return musicFiles;
     }
@@ -159,22 +192,37 @@ public class MusicPlayerLogic {
         return mediaFiles;
     }
 
-    public Media getCurrentMedia() {
-        return currentMedia;
+    public Media getCurrentSongMedia() {
+        return mediaPlayer == null ? null : mediaPlayer.getMedia();
     }
 
-    public int getCurrentSongIndex() {return mediaFiles.indexOf(currentMedia);}
+    public int getCurrentSongIndex() {
+        return mediaFiles.indexOf(getCurrentSongMedia());
+    }
 
     public File getCurrentMusicFile() { return currentMusicFile; }
 
     public void stopCurrentSong() {
-        if (mediaPlayer != null)
+        if (mediaPlayer != null) {
             mediaPlayer.pause();
+            progressBarTimeline.pause();
+        }
     }
 
     public void playRecentlyPlayedSong(RecentlyPlayedSong rps, Runnable onMediaPlayerReady) {
         playList = null;
         File file = new File(rps.getPath());
+
+        if (!file.exists()) {
+            ButtonType okBtn = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
+            Alert alert = new Alert(Alert.AlertType.ERROR,"Không tìm thấy file '"+ rps.getName() +
+                    "' ở địa chỉ '" + rps.getPath() + "'. File có thể đã bị xóa hoặc bị dời đi nơi khác", okBtn );
+            alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+            alert.setTitle("Không tìm thấy file nhạc");
+            alert.showAndWait();
+            db.deleteRecentlyPlayedSongById(rps.getId());
+            return;
+        }
 
         musicFiles.clear();
         musicFiles.add(file);
@@ -190,12 +238,12 @@ public class MusicPlayerLogic {
     }
 
     public void playNextSong(Runnable onMediaPlayerReady) {
-        int index = Math.min(mediaFiles.indexOf(currentMedia) + 1, mediaFiles.size() - 1) ;
+        int index = Math.min(mediaFiles.indexOf(getCurrentSongMedia()) + 1, mediaFiles.size() - 1) ;
         playSongByIndex(index, onMediaPlayerReady);
     }
 
     public void playPrevSong(Runnable onMediaPlayerReady) {
-        int index = Math.max(mediaFiles.indexOf(currentMedia) - 1, 0);
+        int index = Math.max(mediaFiles.indexOf(getCurrentSongMedia()) - 1, 0);
         playSongByIndex(index, onMediaPlayerReady);
     }
 
@@ -208,18 +256,18 @@ public class MusicPlayerLogic {
         startStopImage.setImage(new Image("/pause.png"));
 
         currentMusicFile = musicFiles.get(index);
-        currentMedia = mediaFiles.get(index);
 
         stopCurrentSong();
 
-        mediaPlayer = new MediaPlayer(currentMedia);
-        mediaPlayer.play();
+        mediaPlayer = new MediaPlayer(mediaFiles.get(index));
+        progressBar.setDisable(false);
         progressBarTimeline.playFromStart();
+        mediaPlayer.play();
 
         mediaPlayer.setOnReady(() -> {
             db.deleteRecentlyPlayedSongByPath(currentMusicFile.getPath());
 
-            ObservableMap<String, Object> metadata = currentMedia.getMetadata();
+            ObservableMap<String, Object> metadata = getCurrentSongMedia().getMetadata();
             db.insertRecentlyPlayedSong(new RecentlyPlayedSong(
                 -1,
                 (String) metadata.getOrDefault("title", getNameWithoutExtension(currentMusicFile)),
@@ -230,28 +278,38 @@ public class MusicPlayerLogic {
                 onMediaPlayerReady.run();
             }
         });
+
         mediaPlayer.setOnEndOfMedia(() -> {
+            mediaPlayer.seek(Duration.ZERO);
+            mediaPlayer.stop();
+            handleStartStopSong();
+
             if (loopOne) {
                 mediaPlayer.seek(Duration.ZERO);
                 mediaPlayer.play();
                 return;
             }
 
-            if (currentMedia == mediaFiles.get(mediaFiles.size() - 1)) {
-                if (loopAll) {
-                    playSongByIndex(0, onMediaPlayerReady);
-                }
-
+            if (getCurrentSongIndex() < mediaFiles.size() - 1) {
+                playNextSong(onMediaPlayerReady);
                 return;
             }
 
-            playNextSong(onMediaPlayerReady);
+            if (loopAll) {
+                playSongByIndex(0, onMediaPlayerReady);
+                return;
+            }
         });
+    }
+
+    private void setProgressBarToZero() {
+        progressBar.setValue(0);
+        songCurrentTime.setText("00:00");
     }
 
     private Timeline createProgressBarTimeline() {
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), ev -> {
-            progressBar.setValue((mediaPlayer.getCurrentTime().toSeconds() / currentMedia.getDuration().toSeconds()) * 100);
+            progressBar.setValue((mediaPlayer.getCurrentTime().toSeconds() / getCurrentSongMedia().getDuration().toSeconds()) * 100);
 
             int secs = (int) Math.round(mediaPlayer.getCurrentTime().toSeconds());
             int minPart = secs/60;
@@ -259,7 +317,6 @@ public class MusicPlayerLogic {
             songCurrentTime.setText(String.format("%02d", minPart) + ":" + String.format("%02d", secPart));
         }));
         timeline.setCycleCount(Animation.INDEFINITE);
-
         return timeline;
     }
 
@@ -269,7 +326,11 @@ public class MusicPlayerLogic {
 
     private long prevX;
     private void seekMusic(MouseEvent e) {
-        double time = (e.getX() / progressBar.getWidth()) * currentMedia.getDuration().toSeconds();
+        if (getCurrentSongMedia() == null) {
+            return;
+        }
+
+        double time = (e.getX() / progressBar.getWidth()) * getCurrentSongMedia().getDuration().toSeconds();
 
         if (Math.round(e.getX()) == prevX) {
             return;
@@ -281,8 +342,12 @@ public class MusicPlayerLogic {
 
     public void playSongInPlaylist(Playlist playlist, Runnable onMediaPlayerReady) {
         playList = playlist;
-        musicFiles = Arrays.stream(playlist.getSongPaths()).map(path -> new File(path)).collect(Collectors.toList());
-        mediaFiles = musicFiles.stream().map(f -> new Media(f.toURI().toString())).collect(Collectors.toList());
+        musicFiles = Arrays.stream(playlist.getSongPaths()).map(File::new)
+                                                           .filter(File::exists)
+                                                           .collect(Collectors.toList());
+
+        mediaFiles = musicFiles.stream().map(f -> new Media(f.toURI().toString()))
+                                        .collect(Collectors.toList());
 
         playSongByIndex(0, onMediaPlayerReady);
     }

@@ -105,7 +105,7 @@ public class Database {
     public ArrayList<Playlist> getSavedPlaylists() {
         try (Connection con = createConnection();
              Statement stm = con.createStatement();
-             ResultSet resultSet = stm.executeQuery("SELECT * FROM playlists LIMIT 10");) {
+             ResultSet resultSet = stm.executeQuery("SELECT * FROM playlists ORDER BY id DESC");) {
 
             ArrayList<Playlist> playlists = new ArrayList<>();
             // display the column header in the ResultSet

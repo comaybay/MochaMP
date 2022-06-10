@@ -3,14 +3,12 @@ package com.example.mochamp.controllers;
 import com.example.mochamp.Database;
 import com.example.mochamp.models.Playlist;
 import javafx.event.ActionEvent;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -20,7 +18,7 @@ import java.util.function.Consumer;
 public class SelectPlaylistController {
     public VBox container;
 
-    public void setOnClickItem(Consumer<Playlist> handler) throws Exception {
+    public void setup(Consumer<Playlist> onClickItemHandler, Consumer<Playlist> onDeletePlaylistHandler) throws Exception {
         Database db = Database.getInstance();
 
         container.getChildren().clear();
@@ -31,7 +29,7 @@ public class SelectPlaylistController {
             item.getStyleClass().add("txt-btn");
             item.setPrefWidth(200);
             item.setOnAction(e -> {
-                handler.accept(playlist);
+                onClickItemHandler.accept(playlist);
                 closeDialog(e);
             });
 
@@ -49,6 +47,7 @@ public class SelectPlaylistController {
 
                 if (result.orElse(cancelBtn) == okBtn) {
                     db.deletePlaylist(playlist.getId());
+                    onDeletePlaylistHandler.accept(playlist);
                 }
             });
 

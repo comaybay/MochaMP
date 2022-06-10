@@ -74,6 +74,10 @@
     -fx-background-image :url('close.png');
 }
 
+.bg-trash {
+    -fx-background-image :url('trash.png');
+}
+
 .txt-btn {
     -fx-background-color: -white;
 }
