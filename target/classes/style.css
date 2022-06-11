@@ -12,6 +12,10 @@
     -fx-background-radius: 10
 }
 
+.dialog-panel {
+    -fx-background-color: linear-gradient(to bottom, -primary, -primary-dark);
+}
+
 .slider .track {
     -fx-background-radius: 0;
     -fx-background-color: -primary-darker;
@@ -23,13 +27,82 @@
     -fx-background-radius: 0;
     -fx-pref-width: 3px;
     -fx-pref-height: 12px;
-<<<<<<< Updated upstream
-}
-=======
 }
 
 .scroll-pane > .viewport{
    -fx-background-color: -primary;
+}
+
+
+.bg-shuffle {
+    -fx-background-image: url('shuffle.png');
+}
+
+.bg-loop-all {
+    -fx-background-image: url('loop-all.png');
+}
+
+.bg-loop-one {
+    -fx-background-image: url('loop-one.png');
+}
+
+.bg-save-playlist {
+    -fx-background-image :url('save-playlist.png');
+}
+
+.bg-open-playlist {
+    -fx-background-image :url('open-playlist.png');
+}
+
+.bg-settings {
+    -fx-background-image :url('settings.png');
+}
+
+.bg-open-files {
+    -fx-background-image :url('open-files.png');
+}
+
+.bg-rps {
+    -fx-background-image :url('rps.png');
+}
+
+.bg-dot {
+    -fx-background-image :url('dot.png');
+}
+
+.bg-x {
+    -fx-background-image :url('close.png');
+}
+
+.txt-btn {
+    -fx-background-color: -white;
+}
+
+.txt-btn:hover {
+    -fx-background-color: linear-gradient(to right, -accent, -accent-bright);
+    -fx-cursor: hand;
+}
+
+.btn-img {
+    -fx-background-position: center, center;
+    -fx-background-size: contain;
+    -fx-background-color: transparent;
+    -fx-background-repeat: no-repeat;
+    -fx-opacity: 0.5;
+}
+
+.btn-img:hover, .btn-img-alt:hover {
+    -fx-opacity: 0.8;
+    -fx-cursor: hand;
+}
+
+.btn-img-alt {
+    -fx-background-position: center, center;
+    -fx-background-size: contain;
+    -fx-background-color: -primary-darker;
+    -fx-background-repeat: no-repeat;
+    -fx-opacity: 0.5;
+    -fx-padding: 3 20 3 20
 }
 
 /*========================*/
@@ -57,15 +130,23 @@
     -fx-background-color: linear-gradient(to bottom, -primary, -primary-dark);
 }
 
-.Menu {
-    -fx-background-image :url('image/2x/outline_menu_white_18dp.png');
+.Shuffle {
+    -fx-background-image: url('shuffle.png');
+    -fx-background-position: center, center;
+    -fx-background-size: contain;
+    -fx-background-color: transparent;
+    -fx-background-repeat: no-repeat;
+    -fx-opacity: 0.5;
 }
-.Find {
-    -fx-background-image :url('image/2x/outline_search_white_18dp.png');
+
+.Shuffle:hover {
+    -fx-opacity: 0.8;
 }
+
 .Play {
     -fx-background-image :url('image/2x/outline_play_circle_filled_white_18dp.png');
 }
+
 .playing_song_border {
     -fx-border-color: DarkOrchid;
     -fx-border-radius: 10;
@@ -77,6 +158,18 @@
 .dot {
     -fx-background-image :url('image/2x/outline_more_vert_white_18dp.png');
 }
+
+.dialog-pane:header .header-panel .label {
+    -fx-text-fill: white;
+    -fx-font-size: 18;
+    -fx-padding: 0 0 ;
+}
+
+.dialog-pane:header .header-panel{
+    -fx-background-color: transparent;
+    -fx-padding: 5 5;
+}
+
 .white {
     -fx-background-color: White;
 }
@@ -108,14 +201,8 @@
     -fx-background-color: DarkOrchid;
 }
 .DarkViolet {
-    -fx-background-color: #8158a6;
+    -fx-background-color: DarkViolet;
 }
 .DarkSlateBlue {
     -fx-background-color: DarkSlateBlue;
 }
-.bar-background {
-    -fx-control-inner-background: #8158a6;
-    -fx-accent: Plum;
-    border-width: 0;
-}
->>>>>>> Stashed changes

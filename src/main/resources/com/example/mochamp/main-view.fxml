@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import java.net.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
@@ -7,13 +9,9 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<<<<<<< Updated upstream
-<HBox prefHeight="540" prefWidth="960" style="-fx-background-color: transparent;" stylesheets="@../../../style.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.mochamp.controllers.MainController">
-=======
 <HBox fx:id="root" prefHeight="540" prefWidth="960" spacing="20" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.mochamp.controllers.MainController">
->>>>>>> Stashed changes
    <children>
-      <Pane fx:id="player" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="275.0" prefWidth="300.0" styleClass="panel">
+      <Pane fx:id="player" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="300.0" styleClass="panel">
          <children>
             <HBox alignment="CENTER_RIGHT" layoutY="10.0" prefHeight="0.0" prefWidth="300.0">
                <children>
@@ -22,7 +20,7 @@
                         <Image url="@../../../minimize.png" />
                      </image>
                   </ImageView>
-                  <ImageView fx:id="closeButton"  fitHeight="16.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="closeButton" fitHeight="16.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../../../close.png" />
                      </image>
@@ -34,7 +32,7 @@
                <padding>
                   <Insets left="11.0" right="11.0" />
                </padding></HBox>
-            <VBox alignment="TOP_CENTER" layoutX="2.0" layoutY="28.0" prefHeight="250.0" prefWidth="300.0">
+            <VBox alignment="TOP_CENTER" layoutX="2.0" layoutY="28.0">
                <children>
                   <ImageView fx:id="thumbnail" fitHeight="125.0" fitWidth="125.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -44,42 +42,41 @@
                         <Insets />
                      </VBox.margin>
                   </ImageView>
-                  <Label text="Cá Hồi Hoang - Đến Bao Giờ (Audio)" textFill="WHITE">
+                  <Label fx:id="songTitle" alignment="CENTER" prefWidth="260.0" text="Hãy chọn bài hát" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
                      <VBox.margin>
-                        <Insets bottom="5.0" top="5.0" />
+                        <Insets top="5.0" />
                      </VBox.margin>
                   </Label>
-                  <HBox prefHeight="0.0" prefWidth="260.0">
+                  <Label fx:id="songArtist" alignment="CENTER" prefWidth="260.0" text="Tác giả" textFill="WHITE">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets bottom="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <HBox prefWidth="260.0" style="-fx-view-order: 0;">
                      <children>
-                        <Label text="0:00" textFill="WHITE">
+                        <Label fx:id="songCurrentTime" text="00:00" textFill="WHITE">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </Label>
-<<<<<<< Updated upstream
-                        <Slider HBox.hgrow="ALWAYS">
-=======
-                        <ProgressBar fx:id="progressBar" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="12.0" prefWidth="182.0" progress="0.0" style="-fx-border-radius: 0;">
->>>>>>> Stashed changes
+                        <Slider fx:id="progressBar" HBox.hgrow="ALWAYS">
                            <HBox.margin>
-                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                              <Insets left="5.0" right="5.0" top="3.0" />
                            </HBox.margin>
-<<<<<<< Updated upstream
                         </Slider>
-                        <Label text="4:01" textFill="WHITE">
-=======
-                        </ProgressBar>
                         <Label fx:id="songDuration" text="00:00" textFill="WHITE">
->>>>>>> Stashed changes
                            <font>
                               <Font size="14.0" />
                            </font>
                         </Label>
                      </children></HBox>
-                  <HBox alignment="CENTER" prefHeight="64.0" prefWidth="260.0">
+                  <HBox alignment="CENTER" prefHeight="60.0" prefWidth="260.0" style="-fx-view-order: 20;">
                      <children>
                         <StackPane fx:id="prevSong" prefHeight="27.0" prefWidth="21.0">
                            <children>
@@ -91,9 +88,9 @@
                               </ImageView>
                            </children>
                         </StackPane>
-                        <StackPane fx:id="startStop" prefHeight="0.0" prefWidth="50.0">
+                        <StackPane fx:id="startStopButton" prefWidth="50.0">
                            <children>
-                              <Circle fill="WHITE" radius="25.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 30, 0, 0, 0); -fx-background-radius: 100;" />
+                              <Circle fill="WHITE" radius="25.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 15, 0, 0, 0); -fx-background-radius: 100;" />
                               <ImageView fx:id="startStopImage" fitHeight="24.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@../../../play.png" />
@@ -126,39 +123,147 @@
                <padding>
                   <Insets bottom="20.0" left="20.0" right="20.0" />
                </padding></VBox>
-<<<<<<< Updated upstream
-         </children></Pane>
-      <Pane fx:id="playlist" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="275.0" prefWidth="600.0" styleClass="panel">
-=======
          </children>
       </Pane>
-      <VBox fx:id="slidebar" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="300.0" VBox.vgrow="NEVER">
+      <VBox fx:id="playlist" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="300.0" VBox.vgrow="NEVER">
          <VBox.margin>
             <Insets />
          </VBox.margin>
          <children>
-            <Pane prefHeight="160.0" prefWidth="300.0" style="-fx-background-radius: 15; -fx-view-order: 10;" styleClass="BlueViolet">
+            <Pane fx:id="tab" prefHeight="160.0" prefWidth="300.0" style="-fx-background-radius: 15; -fx-view-order: 10;" styleClass="BlueViolet">
                <children>
-                  <Button layoutX="22.0" layoutY="49.0" onAction="#onHelloButtonClick" prefHeight="31.0" prefWidth="35.0" styleClass="Menu" />
-                  <Button fx:id="openSongsButton" layoutX="244.0" layoutY="49.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="35.0" styleClass="Find" />
-                  <Label fx:id="text" alignment="CENTER" layoutX="54.0" layoutY="89.0" prefHeight="35.0" prefWidth="201.0" text="Rockstart" textFill="WHITE">
+                  <Button fx:id="selectRecentlyPlayedSongButton" layoutX="66.0" layoutY="14.0" prefHeight="31.0" prefWidth="35.0">
+                     <tooltip><Tooltip text="Bài hát đã chơi gần đây" /></tooltip>
+                     <styleClass>
+                        <String fx:value="btn-img" />
+                        <String fx:value="bg-rps" />
+                     </styleClass>
+                  </Button>
+                  <Button fx:id="openSongsButton" layoutX="22.0" layoutY="14.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="35.0">
+                     <tooltip><Tooltip text="Mở file nhạc" /></tooltip>
+                     <styleClass>
+                        <String fx:value="bg-open-files" />
+                        <String fx:value="btn-img" />
+                     </styleClass>
+                  </Button>
+                  <Button fx:id="selectPlaylistButton" layoutX="110.0" layoutY="19.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="35.0">
+                     <tooltip><Tooltip text="Chọn playlist đã lưu" /></tooltip>
+                     <styleClass>
+                        <String fx:value="btn-img" />
+                        <String fx:value="bg-open-playlist" />
+                     </styleClass>
+                  </Button>
+                  <Label fx:id="playlistName" alignment="CENTER" layoutX="20.0" layoutY="67.0" prefHeight="27.0" prefWidth="260.0" textAlignment="CENTER" textFill="WHITE">
                      <font>
-                        <Font name="System Bold" size="24.0" />
+                        <Font size="18.0" />
                      </font>
                   </Label>
-                  <Label alignment="CENTER" layoutX="54.0" layoutY="122.0" prefHeight="21.0" prefWidth="201.0" text="A.R Rahaman" textFill="WHITE" />
+                  <Button fx:id="savePlaylistButton" layoutX="22.0" layoutY="130.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="27.0">
+                     <tooltip><Tooltip style="-fx-font-size: 11px" text="Lưu/cập nhật playlist hiện tại" /></tooltip>
+                     <font>
+                        <Font size="1.0" />
+                     </font>
+                     <styleClass>
+                        <String fx:value="btn-img" />
+                        <String fx:value="bg-save-playlist" />
+                     </styleClass>
+                  </Button>
+                  <Button fx:id="settingsButton" layoutX="249.0" layoutY="19.0" onAction="#onHelloButtonClick" prefHeight="31.0" prefWidth="35.0">
+                     <tooltip><Tooltip text="Mở tùy chọn" /></tooltip>
+                     <styleClass>
+                        <String fx:value="bg-settings" />
+                        <String fx:value="btn-img" />
+                     </styleClass>
+                  </Button>
+                  <Button fx:id="shuffleSongsButton" layoutX="88.0" layoutY="129.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="27.0">
+                     <tooltip><Tooltip style="-fx-font-size: 11px" text="Trộn ngẫu nhiên bài hát trong playlist" /></tooltip>
+                     <font>
+                        <Font size="1.0" />
+                     </font>
+                     <styleClass>
+                        <String fx:value="btn-img" />
+                        <String fx:value="bg-shuffle" />
+                     </styleClass>
+                  </Button>
+                  <Button fx:id="loopAllButton" layoutX="137.0" layoutY="129.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="27.0">
+                     <tooltip><Tooltip style="-fx-font-size: 11px" text="Lặp lại playlist" /></tooltip>
+                     <font>
+                        <Font size="1.0" />
+                     </font>
+                     <styleClass>
+                        <String fx:value="btn-img" />
+                        <String fx:value="bg-loop-all" />
+                     </styleClass>
+                  </Button>
+                  <Button fx:id="loopOneButton" layoutX="187.0" layoutY="129.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="27.0">
+                     <tooltip><Tooltip style="-fx-font-size: 11px" text="Lặp lại bài hát hiện tại" /></tooltip>
+                     <font>
+                        <Font size="1.0" />
+                     </font>
+                     <styleClass>
+                        <String fx:value="btn-img" />
+                        <String fx:value="bg-loop-one" />
+                     </styleClass>
+                  </Button>
                </children>
             </Pane>
-            <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="350.0" prefWidth="300.0" style="-fx-fit-to-width: true;" styleClass="panel">
+            <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="350.0" styleClass="panel">
                <content>
-                  <VBox fx:id="songContainer" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onScroll="#onScroll" prefWidth="298.0" style="-fx-view-order: 20;" />
+                  <VBox fx:id="songContainer" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="298.0" style="-fx-view-order: 20;" />
                </content>
             </ScrollPane>
-            <Pane layoutY="675.0" prefHeight="25.0" prefWidth="300.0" style="-fx-background-radius: 15; -fx-view-order: 10;" styleClass="BlueViolet" />
+            <Pane fx:id="bottom" layoutY="675.0" prefHeight="25.0" prefWidth="300.0" style="-fx-background-radius: 15; -fx-view-order: 10;" styleClass="BlueViolet" />
          </children>
->>>>>>> Stashed changes
          <HBox.margin>
-            <Insets left="5.0" />
-         </HBox.margin></Pane>
+            <Insets />
+         </HBox.margin>
+         <styleClass>
+            <String fx:value="BlueViolet" />
+            <String fx:value="panel" />
+         </styleClass>
+      </VBox>
+      <Pane fx:id="menu" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="300.0" VBox.vgrow="NEVER">
+         <VBox.margin>
+            <Insets bottom="-0.0" />
+         </VBox.margin>
+         <children>
+            <Label alignment="CENTER" layoutX="26.0" layoutY="27.0" text="Cài đặt" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label layoutX="80.0" layoutY="71.0" text="Chế độ tối" textFill="WHITE">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label layoutX="80.0" layoutY="123.0" text="Sắp xếp bài hát" textFill="WHITE">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label layoutX="80.0" layoutY="228.0" text="Tự động phát" textFill="WHITE">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" layoutX="26.0" layoutY="193.0" text="Phát" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Line endX="100.0" layoutX="152.0" layoutY="176.0" startX="-100.0" stroke="WHITE" />
+            <CheckBox fx:id="cb_darkskin" layoutX="234.0" layoutY="71.0" mnemonicParsing="false" />
+            <CheckBox fx:id="cb_sort" layoutX="234.0" layoutY="123.0" mnemonicParsing="false" />
+            <CheckBox fx:id="cb_autoplay" layoutX="234.0" layoutY="228.0" mnemonicParsing="false" selected="true" />
+         </children>
+         <styleClass>
+            <String fx:value="BlueViolet" />
+            <String fx:value="panel" />
+         </styleClass>
+      </Pane>
    </children>
+   <stylesheets>
+      <URL value="@../../../style.css" />
+   </stylesheets>
 </HBox>

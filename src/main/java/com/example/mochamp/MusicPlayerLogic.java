@@ -1,19 +1,13 @@
 package com.example.mochamp;
 
-import com.example.mochamp.controllers.MainController;
+import com.example.mochamp.models.Playlist;
+import com.example.mochamp.models.RecentlyPlayedSong;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
-import javafx.event.Event;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -21,38 +15,51 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Timer;
+import java.util.stream.Collectors;
 
 public class MusicPlayerLogic {
-    private final List<File> musicFiles;
-    private final List<Media> mediaFiles;
+    private List<File> musicFiles;
+    private List<Media> mediaFiles;
+    private Database db;
     private Media currentMedia;
     private File currentMusicFile;
     private MediaPlayer mediaPlayer;
-    private Timer timer;
     private boolean playing = false;
+    private Playlist playList = null;
     private Timeline progressBarTimeline = null;
 
-    private final HBox root;
-    private final Label songCurrentTime;
+    public boolean isLoopOne() {
+        return loopOne;
+    }
+
+    public boolean isLoopAll() {
+        return loopAll;
+    }
+
+    private boolean loopOne = false;
+    private boolean loopAll = false;
+
+    private HBox root;
+    private Label songCurrentTime;
     public ImageView thumbnail;
-    private final ProgressBar progressBar;
-    private final ImageView startStopImage;
+    private Slider progressBar;
+    private ImageView startStopImage;
 
     public MusicPlayerLogic(
             HBox root, Label songTitle, Label songDuration, Label songCurrentTime, ImageView thumbnail,
-             ProgressBar progressBar, StackPane startStopButton, ImageView startStopImage,
+            Slider progressBar, StackPane startStopButton, ImageView startStopImage,
             Button openSongsButton, VBox songContainer
-    ) {
+    ) throws Exception {
+        this.db = Database.getInstance();
+
         this.songCurrentTime = songCurrentTime;
         this.progressBar = progressBar;
         this.startStopImage = startStopImage;
@@ -65,27 +72,17 @@ public class MusicPlayerLogic {
     }
 
     public void useProgressBarLogic() {
-        progressBar.setOnMousePressed(this::seekMusic);
+        progressBar.setOnMousePressed(e -> seekMusic(e));
         progressBar.setOnDragDetected(e -> progressBarTimeline.pause());
-        progressBar.setOnMouseReleased(e -> { seekMusic(e); prevX = 999; progressBarTimeline.playFromStart(); });
+        progressBar.setOnMouseReleased(e -> { seekMusic(e); prevX = -9999; progressBarTimeline.playFromStart(); });
     }
 
-    public void handleStartStopSong(int value) {
+    public void handleStartStopSong() {
         if (mediaPlayer == null)
             return;
 
         playing = !playing;
         Image image = playing ? new Image("/pause.png") : new Image("/play.png");
-        Image img_pause = new Image("image/2x/outline_pause_circle_filled_white_18dp.png");
-        BackgroundImage bgImagedot = new BackgroundImage(img_pause, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
-                BackgroundSize.DEFAULT);
-        Image img_play = new Image("image/2x/outline_play_circle_filled_white_18dp.png");
-        BackgroundImage bgImagePlay = new BackgroundImage(img_play, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
-                BackgroundSize.DEFAULT);
-
-        Background bg = playing ? new Background(bgImagedot) : new Background(bgImagePlay);
-        MainController.setArrayButton().get(value).setBackground(bg);
-
         startStopImage.setImage(image);
 
         if (playing)
@@ -94,11 +91,40 @@ public class MusicPlayerLogic {
             mediaPlayer.pause();
     }
 
+    public boolean toggleLoopAll() {
+        loopAll = !loopAll;
+        return loopAll;
+    }
+
+    public boolean toggleLoopOne() {
+        loopOne = !loopOne;
+        return loopOne;
+    }
+
     /**
-    Mở FileChooser để chọn bài hát
-    @return danh sách bài hát người dùng đã chọn
+     * Lấy tên của playlist
+     * @return tên playlist, trả về chuỗi trống nếu chưa mở playlist nào
      */
-    public List<File> openSongChooserDialog() {
+    public String getPlaylistName() {
+        return playList == null ? "" : playList.getName();
+    }
+
+    /**
+     * Lấy playlist
+     * @return playlist, trả về null nếu chưa mở playlist nào
+     */
+    public Playlist getPlaylist() {
+        return playList;
+    }
+
+    public void setPlaylist(Playlist pl) {
+        playList = pl;
+    }
+
+    /**
+    Thêm bài hát từ FileChooser và chơi bài vừa thêm đầu tiên
+     */
+    public void addSongsFromFileChooser(Runnable onMediaPlayerReady) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Chọn file nhạc");
         fileChooser.getExtensionFilters().add(
@@ -113,13 +139,16 @@ public class MusicPlayerLogic {
         List<File> selectedFiles = fileChooser.showOpenMultipleDialog(stage);
         selectedFiles = selectedFiles == null ? new ArrayList<>() : selectedFiles;
 
+        int prevPlaylistLength = musicFiles.size();
         musicFiles.addAll(selectedFiles);
 
         for (File file: selectedFiles) {
             mediaFiles.add(new Media(file.toURI().toString()));
         }
 
-        return selectedFiles;
+        if (selectedFiles.size() != 0) {
+            playSongByIndex(prevPlaylistLength, onMediaPlayerReady);
+        }
     }
 
     public List<File> getMusicFiles() {
@@ -141,6 +170,23 @@ public class MusicPlayerLogic {
     public void stopCurrentSong() {
         if (mediaPlayer != null)
             mediaPlayer.pause();
+    }
+
+    public void playRecentlyPlayedSong(RecentlyPlayedSong rps, Runnable onMediaPlayerReady) {
+        playList = null;
+        File file = new File(rps.getPath());
+
+        musicFiles.clear();
+        musicFiles.add(file);
+
+        mediaFiles.clear();
+        mediaFiles.add(new Media(file.toURI().toString()));
+
+        playSongByIndex(0, onMediaPlayerReady);
+
+        //move rps to top of list
+        db.deleteRecentlyPlayedSongById(rps.getId());
+        db.insertRecentlyPlayedSong(rps);
     }
 
     public void playNextSong(Runnable onMediaPlayerReady) {
@@ -167,17 +213,45 @@ public class MusicPlayerLogic {
         stopCurrentSong();
 
         mediaPlayer = new MediaPlayer(currentMedia);
-        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
         mediaPlayer.play();
         progressBarTimeline.playFromStart();
 
-        mediaPlayer.setOnReady(onMediaPlayerReady);
+        mediaPlayer.setOnReady(() -> {
+            db.deleteRecentlyPlayedSongByPath(currentMusicFile.getPath());
+
+            ObservableMap<String, Object> metadata = currentMedia.getMetadata();
+            db.insertRecentlyPlayedSong(new RecentlyPlayedSong(
+                -1,
+                (String) metadata.getOrDefault("title", getNameWithoutExtension(currentMusicFile)),
+                currentMusicFile.getPath()
+            ));
+
+            if (onMediaPlayerReady != null) {
+                onMediaPlayerReady.run();
+            }
+        });
+        mediaPlayer.setOnEndOfMedia(() -> {
+            if (loopOne) {
+                mediaPlayer.seek(Duration.ZERO);
+                mediaPlayer.play();
+                return;
+            }
+
+            if (currentMedia == mediaFiles.get(mediaFiles.size() - 1)) {
+                if (loopAll) {
+                    playSongByIndex(0, onMediaPlayerReady);
+                }
+
+                return;
+            }
+
+            playNextSong(onMediaPlayerReady);
+        });
     }
 
     private Timeline createProgressBarTimeline() {
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), ev -> {
-            progressBar.setProgress((mediaPlayer.getCurrentTime().toSeconds() / currentMedia.getDuration().toSeconds()) );
-
+            progressBar.setValue((mediaPlayer.getCurrentTime().toSeconds() / currentMedia.getDuration().toSeconds()) * 100);
 
             int secs = (int) Math.round(mediaPlayer.getCurrentTime().toSeconds());
             int minPart = secs/60;
@@ -196,12 +270,58 @@ public class MusicPlayerLogic {
     private long prevX;
     private void seekMusic(MouseEvent e) {
         double time = (e.getX() / progressBar.getWidth()) * currentMedia.getDuration().toSeconds();
+
         if (Math.round(e.getX()) == prevX) {
             return;
         }
 
         prevX = Math.round(e.getX());
         mediaPlayer.seek(Duration.seconds(time));
+    }
 
+    public void playSongInPlaylist(Playlist playlist, Runnable onMediaPlayerReady) {
+        playList = playlist;
+        musicFiles = Arrays.stream(playlist.getSongPaths()).map(path -> new File(path)).collect(Collectors.toList());
+        mediaFiles = musicFiles.stream().map(f -> new Media(f.toURI().toString())).collect(Collectors.toList());
+
+        playSongByIndex(0, onMediaPlayerReady);
+    }
+
+    public void playOneSong(int index, Runnable onMediaPlayerReady){
+        if (mediaFiles.size() == 0) {
+            return;
+        }
+
+        playing = true;
+        startStopImage.setImage(new Image("/pause.png"));
+
+        currentMusicFile = musicFiles.get(index);
+        currentMedia = mediaFiles.get(index);
+
+        stopCurrentSong();
+
+        mediaPlayer = new MediaPlayer(currentMedia);
+        mediaPlayer.play();
+        progressBarTimeline.playFromStart();
+
+        mediaPlayer.setOnReady(() -> {
+            db.deleteRecentlyPlayedSongByPath(currentMusicFile.getPath());
+
+            ObservableMap<String, Object> metadata = currentMedia.getMetadata();
+            db.insertRecentlyPlayedSong(new RecentlyPlayedSong(
+                    -1,
+                    (String) metadata.getOrDefault("title", getNameWithoutExtension(currentMusicFile)),
+                    currentMusicFile.getPath()
+            ));
+
+            if (onMediaPlayerReady != null) {
+                onMediaPlayerReady.run();
+            }
+        });
+        mediaPlayer.setOnEndOfMedia(() -> {
+            mediaPlayer.seek(Duration.ZERO);
+            mediaPlayer.pause();
+            startStopImage.setImage(new Image("/play.png"));
+        });
     }
 }

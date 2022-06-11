@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<DialogPane headerText="Cập nhật playlist" prefHeight="144.0" prefWidth="270.0" styleClass="dialog-panel" stylesheets="@../../../style.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.mochamp.controllers.UpdatePlaylistDialogController">
+   <content>
+      <Pane minHeight="60">
+         <children>
+            <Label layoutX="21.0" layoutY="22.0" text="Tên playlist:" textFill="WHITE" />
+            <Label fx:id="errorLabel" layoutX="21.0" layoutY="45.0" textFill="#901500">
+               <font>
+                  <Font size="10.0" />
+               </font>
+               <padding>
+                  <Insets bottom="5.0" />
+               </padding></Label>
+            <TextField fx:id="playlistField" layoutX="91.0" layoutY="18.0" />
+            <Button layoutX="22.0" layoutY="65.0" onAction="#onNewPlaylist" styleClass="txt-btn" text="Tạo playlist mới" />
+            <Button layoutX="130.0" layoutY="65.0" onAction="#onUpdate" styleClass="txt-btn" text="Cập nhật" />
+            <Button layoutX="202.0" layoutY="65.0" onAction="#onCancel" styleClass="txt-btn" text="Hủy" />
+         </children></Pane>
+   </content>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</DialogPane>
