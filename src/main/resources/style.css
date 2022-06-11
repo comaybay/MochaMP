@@ -1,4 +1,6 @@
 * {
+        -dark-skin : rgb(32, 31, 31);
+        -dark-skin-light : rgb(60, 60, 60);
         -primary : #A97BD1;
         -primary-dark : #8E62B5;
         -primary-darker: #8158a6;
@@ -9,6 +11,11 @@
 
 .panel {
     -fx-background-color: linear-gradient(to bottom, -primary, -primary-dark);
+    -fx-background-radius: 10
+}
+
+.panel-dark {
+    -fx-background-color: -dark-skin;
     -fx-background-radius: 10
 }
 
@@ -99,6 +106,12 @@
     -fx-pref-height: 12px;
 }
 
+.slider.progressbar-dark .track {
+    -fx-background-radius: 0;
+    -fx-background-color: -dark-skin-light;
+    -fx-pref-height: 12px;
+}
+
 .slider .thumb {
     -fx-background-color: linear-gradient(to right, -accent, -accent-bright);
     -fx-background-radius: 0;
@@ -106,8 +119,12 @@
     -fx-pref-height: 12px;
 }
 
-.scroll-pane > .viewport{
+.scroll-pane.panel > .viewport{
    -fx-background-color: -primary;
+}
+
+.scroll-pane.panel-dark > .viewport{
+   -fx-background-color: -dark-skin-light;
 }
 
 .dialog-pane:header .header-panel .label {

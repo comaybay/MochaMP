@@ -232,7 +232,6 @@ public class Database {
      * @return playlist được thêm vào (chứa cả id được gán trong CSDL)
      */
     public Playlist insertPlaylist(Playlist pl) {
-        System.out.println(formatField(pl.getMusicPaths()));
         try (Connection con = createConnection();
              Statement stm = con.createStatement()) {
             stm.executeUpdate("INSERT INTO playlists(name, music_paths) VALUES(" +
@@ -254,7 +253,6 @@ public class Database {
      * @param pl playlist
      */
     public void updatePlaylist(Playlist pl) {
-        System.out.println(formatField(pl.getMusicPaths()));
         try (Connection con = createConnection();
              Statement stm = con.createStatement()) {
             stm.executeUpdate("UPDATE playlists " +

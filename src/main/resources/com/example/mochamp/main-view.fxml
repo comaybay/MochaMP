@@ -15,7 +15,7 @@
    <stylesheets>
       <URL value="@../../../style.css"/>
    </stylesheets>
-   <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+   <Pane fx:id="player" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
          prefWidth="300.0" styleClass="panel">
       <HBox alignment="CENTER_RIGHT" layoutY="10.0" prefHeight="0.0" prefWidth="300.0">
          <padding>
@@ -121,11 +121,9 @@
          <Insets/>
       </HBox.margin>
       <styleClass>
-         <String fx:value="BlueViolet"/>
          <String fx:value="panel"/>
       </styleClass>
-      <Pane prefHeight="160.0" prefWidth="300.0" style="-fx-background-radius: 15; -fx-view-order: 10;"
-            styleClass="BlueViolet">
+      <Pane fx:id="tab" prefHeight="160.0" prefWidth="300.0" style="-fx-background-radius: 15; -fx-view-order: 10;">
          <Button fx:id="selectRecentlyPlayedMusicButton" layoutX="66.0" layoutY="14.0" prefHeight="31.0"
                  prefWidth="35.0">
             <tooltip>
@@ -243,46 +241,44 @@
          <VBox fx:id="musicContainer" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
                prefWidth="288.0" style="-fx-view-order: 20; -fx-font-size: 11;"/>
       </ScrollPane>
-      <Pane layoutY="675.0" prefHeight="25.0" prefWidth="300.0"
-            style="-fx-background-radius: 15; -fx-view-order: 10;" styleClass="BlueViolet"/>
+      <Pane fx:id="bottom" layoutY="675.0" prefHeight="25.0" prefWidth="300.0"
+            style="-fx-background-radius: 15; -fx-view-order: 10;"/>
    </VBox>
-   <Pane fx:id="menu" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-         prefHeight="300.0" prefWidth="300.0" VBox.vgrow="NEVER">
+   <Pane fx:id="menu" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="300.0" VBox.vgrow="NEVER">
       <VBox.margin>
-         <Insets bottom="-0.0"/>
+         <Insets bottom="-0.0" />
       </VBox.margin>
+         <Label alignment="CENTER" layoutX="26.0" layoutY="27.0" text="Cài đặt" textFill="WHITE">
+            <font>
+               <Font name="System Bold" size="24.0" />
+            </font>
+         </Label>
+         <Label layoutX="80.0" layoutY="71.0" text="Chế độ tối" textFill="WHITE">
+            <font>
+               <Font size="18.0" />
+            </font>
+         </Label>
+         <Label layoutX="80.0" layoutY="123.0" text="Sắp xếp bài hát" textFill="WHITE">
+            <font>
+               <Font size="18.0" />
+            </font>
+         </Label>
+         <Label layoutX="80.0" layoutY="228.0" text="Tự động phát" textFill="WHITE">
+            <font>
+               <Font size="18.0" />
+            </font>
+         </Label>
+         <Label alignment="CENTER" layoutX="26.0" layoutY="193.0" text="Phát" textFill="WHITE">
+            <font>
+               <Font name="System Bold" size="24.0" />
+            </font>
+         </Label>
+         <Line endX="100.0" layoutX="152.0" layoutY="176.0" startX="-100.0" stroke="WHITE" />
+         <CheckBox fx:id="cb_darkskin" layoutX="234.0" layoutY="71.0" mnemonicParsing="false" />
+         <CheckBox fx:id="cb_sort" layoutX="234.0" layoutY="123.0" mnemonicParsing="false" />
+         <CheckBox fx:id="cb_autoplay" layoutX="234.0" layoutY="228.0" mnemonicParsing="false" selected="true" />
       <styleClass>
-         <String fx:value="BlueViolet"/>
-         <String fx:value="panel"/>
+         <String fx:value="panel" />
       </styleClass>
-      <Label alignment="CENTER" layoutX="26.0" layoutY="27.0" text="Main" textFill="WHITE">
-         <font>
-            <Font name="System Bold" size="24.0"/>
-         </font>
-      </Label>
-      <Label layoutX="80.0" layoutY="71.0" text="Album Style" textFill="WHITE">
-         <font>
-            <Font size="18.0"/>
-         </font>
-      </Label>
-      <Label layoutX="80.0" layoutY="123.0" text="Singer Style" textFill="WHITE">
-         <font>
-            <Font size="18.0"/>
-         </font>
-      </Label>
-      <Label layoutX="80.0" layoutY="228.0" text="Lyrics Style" textFill="WHITE">
-         <font>
-            <Font size="18.0"/>
-         </font>
-      </Label>
-      <Label alignment="CENTER" layoutX="26.0" layoutY="193.0" text="Toggle Control" textFill="WHITE">
-         <font>
-            <Font name="System Bold" size="24.0"/>
-         </font>
-      </Label>
-      <Line endX="100.0" layoutX="152.0" layoutY="176.0" startX="-100.0" stroke="WHITE"/>
-      <CheckBox layoutX="234.0" layoutY="71.0" mnemonicParsing="false"/>
-      <CheckBox layoutX="234.0" layoutY="123.0" mnemonicParsing="false"/>
-      <CheckBox layoutX="234.0" layoutY="228.0" mnemonicParsing="false"/>
    </Pane>
 </HBox>

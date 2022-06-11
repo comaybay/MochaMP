@@ -23,7 +23,9 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.File;
+import java.text.Collator;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class MainController {
@@ -38,6 +40,7 @@ public class MainController {
     public HBox root;
 
     // biến của phần chơi nhạc
+    public Pane player;
     public Label musicTitle;
     public Label musicArtist;
     public Label musicDuration;
@@ -65,6 +68,13 @@ public class MainController {
     public VBox musicContainer;
     public VBox playlist;
     public Label playlistName;
+    public Pane tab;
+    public Pane bottom;
+
+    // biến của phần cài đặt
+    public CheckBox cb_sort;
+    public CheckBox cb_darkskin;
+    public CheckBox cb_autoplay;
 
     /**
      * Setup màn hình chính của chương trình
@@ -200,6 +210,11 @@ public class MainController {
                 updateUI();
             }
         });
+
+        // setup phần cài đặt
+        SortPlaylist();
+        DarkSkin();
+        AutoPlay();
     }
 
     /**
@@ -318,15 +333,12 @@ public class MainController {
         String name = musicPlayerLogic.getPlaylistName();
         playlistName.setText(name);
 
-        int itemCount = musicContainer.getChildren().size();
         int musicCount = musicPlayerLogic.getMusicFiles().size();
 
-        if (itemCount != musicCount) {
-            musicContainer.getChildren().clear();
-            for (int i = 0; i < musicPlayerLogic.getMusicFiles().size(); i++) {
-                Pane musicCardComponent = createMusicCardComponent(i);
-                musicContainer.getChildren().add(musicCardComponent);
-            }
+        musicContainer.getChildren().clear();
+        for (int i = 0; i < musicPlayerLogic.getMusicFiles().size(); i++) {
+            Pane musicCardComponent = createMusicCardComponent(i);
+            musicContainer.getChildren().add(musicCardComponent);
         }
 
         if (musicCount == 0) {
@@ -462,7 +474,6 @@ public class MainController {
                     artist.setText(change.getValueAdded().toString());
                 }
                 else if (change.getKey().equals("title")) {
-                    System.out.println(musicName);
                     musicName.setText(change.getValueAdded().toString());
                 }
             }
@@ -476,5 +487,73 @@ public class MainController {
      */
     public void onSettingsButtonClick() {
         menu.setVisible(!menu.isVisible());
+    }
+
+    /**
+     * Sắp xếp bài hát
+     */
+    public void SortPlaylist() {
+        cb_sort.setOnMouseClicked(e -> {
+            musicPlayerLogic.toggleSortMusicByName();
+            updatePlaylistUI();
+        });
+    }
+
+    /**
+     * đồng bộ 2 btn play
+     */
+    public void onChangeBtnPlay(){
+        int index = musicPlayerLogic.getCurrentMusicIndex();
+        Pane selectedSongCard = (Pane)musicContainer.getChildren().get(index);
+        Button btn_play = (Button)selectedSongCard.getChildren().get(0);
+        String[] split = startStopImage.getImage().getUrl().split("/");
+        if (Objects.equals(split[split.length -1], "pause.png")) {
+            btn_play.setBackground(bgPause);
+        }
+        else {
+            btn_play.setBackground(bgPlay);
+        }
+    }
+    /**
+     * Check box đổi màu giao diện
+     */
+    public void DarkSkin(){
+        cb_darkskin.setOnMouseClicked(e -> {
+            Consumer<Node> setStyleClassToDarkSkin = node -> {
+                node.getStyleClass().remove("panel");
+                node.getStyleClass().add("panel-dark");
+            };
+
+            Consumer<Node> setStyleClassToLightSkin = node -> {
+                node.getStyleClass().remove("panel-dark");
+                node.getStyleClass().add("panel");
+            };
+
+            if(cb_darkskin.isSelected()){
+                setStyleClassToDarkSkin.accept(menu);
+                setStyleClassToDarkSkin.accept(player);
+                setStyleClassToDarkSkin.accept(playlist);
+                setStyleClassToDarkSkin.accept(tab);
+                setStyleClassToDarkSkin.accept(bottom);
+                setStyleClassToDarkSkin.accept(playlistScrollPane);
+                progressBar.getStyleClass().add("progressbar-dark");
+            }
+            else {
+                setStyleClassToLightSkin.accept(menu);
+                setStyleClassToLightSkin.accept(player);
+                setStyleClassToLightSkin.accept(playlist);
+                setStyleClassToLightSkin.accept(tab);
+                setStyleClassToLightSkin.accept(bottom);
+                setStyleClassToLightSkin.accept(playlistScrollPane);
+                progressBar.getStyleClass().remove("progressbar-dark");
+            }
+        });
+    }
+
+    /**
+     * Tự động phát
+     */
+    public void AutoPlay(){
+        cb_autoplay.setOnMouseClicked(e -> musicPlayerLogic.toggleAutoPlay());
     }
 }
