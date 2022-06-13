@@ -28,13 +28,12 @@ import java.util.stream.Collectors;
 public class MusicPlayerLogic {
     private List<File> musicFiles;
     private List<Media> musicMediaFiles;
-    private List<File> normalOrderMusicFiles;
+    private final List<File> normalOrderMusicFiles;
 
-    private final Database db;
+    private final DbRepository db;
     private File currentMusicFile;
     private MediaPlayer mediaPlayer;
-    private boolean playing = false;
-    private Playlist playList = null;
+    private Playlist playList;
     private final Timeline progressBarTimeline;
 
     public boolean isLoopOne() {
@@ -45,6 +44,7 @@ public class MusicPlayerLogic {
         return loopAll;
     }
 
+    private boolean playing;
     private boolean loopOne;
     private boolean loopAll;
     private boolean isSortMusicByName;
@@ -60,7 +60,7 @@ public class MusicPlayerLogic {
             HBox root, Label musicCurrentTime, ImageView thumbnail,
             Slider progressBar, ImageView startStopImage
     ) throws Exception {
-        this.db = Database.getInstance();
+        this.db = DbRepository.getInstance();
 
         this.musicCurrentTime = musicCurrentTime;
         this.progressBar = progressBar;
@@ -68,10 +68,12 @@ public class MusicPlayerLogic {
         this.root = root;
         this.thumbnail = thumbnail;
 
+        playing = false;
         loopOne = false;
         loopAll = false;
         isSortMusicByName = false;
         autoPlay = true;
+        playList = null;
 
         musicFiles = new ArrayList<>();
         musicMediaFiles = new ArrayList<>();
@@ -229,21 +231,21 @@ public class MusicPlayerLogic {
 
     /**
      * Chơi nhạc gần đây. Xóa hàng chờ và thêm nhạc gần đây vào hàng chờ
-     * @param rps nhạc gần đây
+     * @param rpm nhạc gần đây
      * @param onMediaPlayerReady callback khi media file sẵn sàng
      */
-    public void playRecentlyPlayedMusic(RecentlyPlayedMusic rps, Runnable onMediaPlayerReady) {
+    public void playRecentlyPlayedMusic(RecentlyPlayedMusic rpm, Runnable onMediaPlayerReady) {
         playList = null;
-        File file = new File(rps.getPath());
+        File file = new File(rpm.getPath());
 
         if (!file.exists()) {
             ButtonType okBtn = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
-            Alert alert = new Alert(Alert.AlertType.ERROR,"Không tìm thấy file '"+ rps.getName() +
-                    "' ở địa chỉ '" + rps.getPath() + "'. File có thể đã bị xóa hoặc bị dời đi nơi khác", okBtn );
+            Alert alert = new Alert(Alert.AlertType.ERROR,"Không tìm thấy file '"+ rpm.getName() +
+                    "' ở địa chỉ '" + rpm.getPath() + "'. File có thể đã bị xóa hoặc bị dời đi nơi khác", okBtn );
             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
             alert.setTitle("Không tìm thấy file nhạc");
             alert.showAndWait();
-            db.deleteRecentlyPlayedMusicById(rps.getId());
+            db.deleteRecentlyPlayedMusic(rpm.getId());
             return;
         }
 
@@ -257,9 +259,9 @@ public class MusicPlayerLogic {
 
         playMusicByIndex(0, onMediaPlayerReady);
 
-        //move rps to top of list
-        db.deleteRecentlyPlayedMusicById(rps.getId());
-        db.insertRecentlyPlayedMusic(rps);
+        //move rpm to top of list
+        db.deleteRecentlyPlayedMusic(rpm.getId());
+        db.insertRecentlyPlayedMusic(rpm);
     }
 
     /**
@@ -320,13 +322,16 @@ public class MusicPlayerLogic {
 
         pauseCurrentMusic();
 
+        if (mediaPlayer != null) {
+            mediaPlayer.dispose();
+        }
         mediaPlayer = new MediaPlayer(musicMediaFiles.get(index));
         progressBar.setDisable(false);
         progressBarTimeline.playFromStart();
         mediaPlayer.play();
 
         mediaPlayer.setOnReady(() -> {
-            db.deleteRecentlyPlayedMusicByPath(currentMusicFile.getPath());
+            db.deleteRecentlyPlayedMusic(currentMusicFile.getPath());
 
             ObservableMap<String, Object> metadata = getCurrentMusicMedia().getMetadata();
             db.insertRecentlyPlayedMusic(new RecentlyPlayedMusic(

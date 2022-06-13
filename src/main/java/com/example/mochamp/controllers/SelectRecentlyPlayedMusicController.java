@@ -1,6 +1,6 @@
 package com.example.mochamp.controllers;
 
-import com.example.mochamp.Database;
+import com.example.mochamp.DbRepository;
 import com.example.mochamp.models.RecentlyPlayedMusic;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
@@ -17,15 +17,15 @@ public class SelectRecentlyPlayedMusicController {
     public VBox container;
 
     public void setup(Consumer<RecentlyPlayedMusic> onClickItemHandler) throws Exception {
-        Database db = Database.getInstance();
+        DbRepository db = DbRepository.getInstance();
 
         container.getChildren().clear();
-        for (RecentlyPlayedMusic rps : db.getRecentlyPlayedMusic()) {
-            Button item = new Button(rps.getName());
+        for (RecentlyPlayedMusic rpm : db.getRecentlyPlayedMusic()) {
+            Button item = new Button(rpm.getName());
             item.getStyleClass().add("txt-btn");
             item.setPrefWidth(200);
             item.setOnAction(e -> {
-                onClickItemHandler.accept(rps);
+                onClickItemHandler.accept(rpm);
                 closeDialog(e);
             });
             container.getChildren().add(item);

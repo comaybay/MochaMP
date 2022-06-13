@@ -131,7 +131,7 @@
             </tooltip>
             <styleClass>
                <String fx:value="btn-img"/>
-               <String fx:value="bg-rps"/>
+               <String fx:value="bg-rpm"/>
             </styleClass>
          </Button>
          <Button fx:id="openMusicButton" layoutX="22.0" layoutY="14.0" mnemonicParsing="false" prefHeight="31.0"

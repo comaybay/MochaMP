@@ -15,32 +15,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Database {
+public class DbRepository {
     String url;
-    String unameDB;
+    String usernameDB;
     String passDB;
 
-    private static Database instance = null;
+    private static DbRepository instance = null;
 
     /**
      * lấy đối tượng singleton
      */
-    public static Database getInstance() throws Exception{
+    public static DbRepository getInstance() throws Exception{
         if (instance == null) {
             List<String> settings = Files.readAllLines(Paths.get("database-settings.txt"))
                     .stream().map(s -> s.split("=")[1])
                     .collect(Collectors.toList());
 
-            instance = new Database(settings.get(0), settings.get(1), settings.get(2));
+            instance = new DbRepository(settings.get(0), settings.get(1), settings.get(2));
             instance.init();
         }
 
         return instance;
     }
 
-    private Database(String url, String unameDB, String passDB) {
+    private DbRepository(String url, String usernameDB, String passDB) {
         this.url = url;
-        this.unameDB = unameDB;
+        this.usernameDB = usernameDB;
         this.passDB = passDB;
     }
 
@@ -84,7 +84,7 @@ public class Database {
 
     private Connection createConnection() throws SQLException {
         try {
-            return DriverManager.getConnection(url, unameDB, passDB);
+            return DriverManager.getConnection(url, usernameDB, passDB);
         }
         catch (SQLException e) {
             ButtonType okBtn = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
@@ -103,7 +103,7 @@ public class Database {
      * Lấy nhạc đã chơi gần đây
      * @return 10 nhạc gần đây nhất
      */
-    public ArrayList<RecentlyPlayedMusic> getRecentlyPlayedMusic() {
+    public List<RecentlyPlayedMusic> getRecentlyPlayedMusic() {
         try (Connection con = createConnection();
              Statement stm = con.createStatement();
              ResultSet resultSet = stm.executeQuery("SELECT * FROM recently_played_music ORDER BY id DESC LIMIT 10")) {
@@ -128,7 +128,7 @@ public class Database {
      * Lấy các playlist đã lưu
      * @return các playlist đã lưu
      */
-    public ArrayList<Playlist> getSavedPlaylists() {
+    public List<Playlist> getSavedPlaylists() {
         try (Connection con = createConnection();
              Statement stm = con.createStatement();
              ResultSet resultSet = stm.executeQuery("SELECT * FROM playlists ORDER BY id DESC")) {
@@ -178,17 +178,17 @@ public class Database {
 
     /**
      * thêm nhạc gần đây vào CSDL
-     * @param rps nhạc gần đây
+     * @param rpm nhạc gần đây
      */
-    public void insertRecentlyPlayedMusic(RecentlyPlayedMusic rps) {
+    public void insertRecentlyPlayedMusic(RecentlyPlayedMusic rpm) {
         try (
             Connection con = createConnection();
             Statement stm = con.createStatement()
         ) {
-        String name =rps.getName().replace("'", "''").replace("\0", "");
+        String name =rpm.getName().replace("'", "''").replace("\0", "");
         stm.executeUpdate("INSERT INTO recently_played_music(name, path) VALUES(" +
                 formatField(name) + ","+
-                formatField(rps.getPath()) +
+                formatField(rpm.getPath()) +
                 ")");
         }
         catch (SQLException e) {
@@ -200,7 +200,7 @@ public class Database {
      * Xóa nhạc gần đây
      * @param id mã của nhạc gần đây muốn xóa
      */
-    public void deleteRecentlyPlayedMusicById(int id){
+    public void deleteRecentlyPlayedMusic(int id){
         try (
                 Connection con = createConnection();
                 Statement stm = con.createStatement()
@@ -215,7 +215,7 @@ public class Database {
      * Xóa nhạc gần đây
      * @param path đường dẫn của nhạc gần đây muốn xóa
      */
-    public void deleteRecentlyPlayedMusicByPath(String path){
+    public void deleteRecentlyPlayedMusic(String path){
         try (
                 Connection con = createConnection();
                 Statement stm = con.createStatement()

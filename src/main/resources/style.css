@@ -51,8 +51,8 @@
     -fx-background-image :url('open-files.png');
 }
 
-.bg-rps {
-    -fx-background-image :url('rps.png');
+.bg-rpm {
+    -fx-background-image :url('rpm.png');
 }
 
 .bg-dot {

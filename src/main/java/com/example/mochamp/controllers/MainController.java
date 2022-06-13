@@ -1,6 +1,6 @@
 package com.example.mochamp.controllers;
 
-import com.example.mochamp.Database;
+import com.example.mochamp.DbRepository;
 import com.example.mochamp.MochaMPApplication;
 import com.example.mochamp.MusicPlayerLogic;
 import com.example.mochamp.Utils;
@@ -23,14 +23,13 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.File;
-import java.text.Collator;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class MainController {
     public Button settingsButton;
-    private Database db;
+    private DbRepository db;
     private MusicPlayerLogic musicPlayerLogic = null;
     private Background bgPause;
     private Background bgPlay;
@@ -80,7 +79,7 @@ public class MainController {
      * Setup màn hình chính của chương trình
      */
     public void initialize() throws Exception {
-        db = Database.getInstance();
+        db = DbRepository.getInstance();
 
         closeButton.setOnMouseClicked(e -> Platform.exit());
 
@@ -152,7 +151,7 @@ public class MainController {
         // setup phần playlist
         selectRecentlyPlayedMusicButton.setOnAction(e -> {
             try {
-                onCLickSelectRPSButton();
+                onCLickSelectRpmButton();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -220,16 +219,16 @@ public class MainController {
     /**
      * Mở popup chọn nhạc chơi gần đây nếu có chơi nhạc nào đó gần đây
      */
-    private void onCLickSelectRPSButton() throws Exception {
+    private void onCLickSelectRpmButton() throws Exception {
         if (db.getRecentlyPlayedMusic().size() == 0) {
             return;
         }
 
-        FXMLLoader loader = new FXMLLoader(MochaMPApplication.class.getResource("select-rps.fxml"));
+        FXMLLoader loader = new FXMLLoader(MochaMPApplication.class.getResource("select-rpm.fxml"));
         AnchorPane pane = loader.load();
 
         SelectRecentlyPlayedMusicController controller = loader.getController();
-        controller.setup(rps -> musicPlayerLogic.playRecentlyPlayedMusic(rps, this::updateUI));
+        controller.setup(rpm -> musicPlayerLogic.playRecentlyPlayedMusic(rpm, this::updateUI));
 
         Utils.setupPopupPane(pane, selectRecentlyPlayedMusicButton)
              .show();
@@ -385,6 +384,7 @@ public class MainController {
                     return;
                 }
 
+                // Đồng bộ nút play lớn với nút play nhỏ
                 btn_play.setBackground(bgPlay);
                 mediaPlayer.setOnPlaying(() -> {
                     btn_play.setBackground(bgPause);
@@ -499,21 +499,6 @@ public class MainController {
         });
     }
 
-    /**
-     * đồng bộ 2 btn play
-     */
-    public void onChangeBtnPlay(){
-        int index = musicPlayerLogic.getCurrentMusicIndex();
-        Pane selectedSongCard = (Pane)musicContainer.getChildren().get(index);
-        Button btn_play = (Button)selectedSongCard.getChildren().get(0);
-        String[] split = startStopImage.getImage().getUrl().split("/");
-        if (Objects.equals(split[split.length -1], "pause.png")) {
-            btn_play.setBackground(bgPause);
-        }
-        else {
-            btn_play.setBackground(bgPlay);
-        }
-    }
     /**
      * Check box đổi màu giao diện
      */

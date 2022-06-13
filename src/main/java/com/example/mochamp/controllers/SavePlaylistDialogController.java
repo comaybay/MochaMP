@@ -1,7 +1,7 @@
 package com.example.mochamp.controllers;
 
 
-import com.example.mochamp.Database;
+import com.example.mochamp.DbRepository;
 import com.example.mochamp.MusicPlayerLogic;
 import com.example.mochamp.models.Playlist;
 import javafx.event.ActionEvent;
@@ -21,7 +21,7 @@ public class SavePlaylistDialogController {
     public TextField playlistField;
     public Label errorLabel;
 
-    private Database db;
+    private DbRepository db;
     private MusicPlayerLogic musicPlayerLogic;
     private Runnable onSuccessHandler;
 
@@ -31,7 +31,7 @@ public class SavePlaylistDialogController {
     }
 
     public void initialize() throws Exception {
-        db = Database.getInstance();
+        db = DbRepository.getInstance();
     }
 
     public void onSave(ActionEvent event) {

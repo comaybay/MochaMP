@@ -1,6 +1,6 @@
 package com.example.mochamp.controllers;
 
-import com.example.mochamp.Database;
+import com.example.mochamp.DbRepository;
 import com.example.mochamp.models.Playlist;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
@@ -22,7 +22,7 @@ public class SelectPlaylistController {
     public VBox container;
 
     public void setup(Consumer<Playlist> onClickItemHandler, Consumer<Playlist> onDeletePlaylistHandler) throws Exception {
-        Database db = Database.getInstance();
+        DbRepository db = DbRepository.getInstance();
 
         container.getChildren().clear();
         for (Playlist playlist : db.getSavedPlaylists()) {
