@@ -228,10 +228,10 @@ public class MainController {
         AnchorPane pane = loader.load();
 
         SelectRecentlyPlayedMusicController controller = loader.getController();
-        controller.setup(rpm -> musicPlayerLogic.playRecentlyPlayedMusic(rpm, this::updateUI));
-
-        Utils.setupPopupPane(pane, selectRecentlyPlayedMusicButton)
-             .show();
+        controller.setup(
+            pane, selectRecentlyPlayedMusicButton,
+            rpm -> musicPlayerLogic.playRecentlyPlayedMusic(rpm, this::updateUI)
+        );
     }
 
     /**
@@ -247,17 +247,16 @@ public class MainController {
 
         SelectPlaylistController controller = loader.getController();
         controller.setup(
-                playlist -> musicPlayerLogic.playMusicInPlaylist(playlist, this::updateUI),
-                playlist -> {
-                    if (musicPlayerLogic.getPlaylist() != null &&
-                            playlist.getId() == musicPlayerLogic.getPlaylist().getId()) {
-                        musicPlayerLogic.setPlaylist(null);
-                        musicPlayerLogic.clearAllMusicFromQueue();
-                        updateUI();
-                    }
-                });
-        Utils.setupPopupPane(pane, selectPlaylistButton)
-             .show();
+            pane, selectPlaylistButton,
+            playlist -> musicPlayerLogic.playMusicInPlaylist(playlist, this::updateUI),
+            playlist -> {
+                if (musicPlayerLogic.getPlaylist() != null &&
+                        playlist.getId() == musicPlayerLogic.getPlaylist().getId()) {
+                    musicPlayerLogic.setPlaylist(null);
+                    musicPlayerLogic.clearAllMusicFromQueue();
+                    updateUI();
+                }
+        });
     }
 
     /**

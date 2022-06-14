@@ -2,23 +2,25 @@ package com.example.mochamp.controllers;
 
 import com.example.mochamp.DbRepository;
 import com.example.mochamp.models.RecentlyPlayedMusic;
-import javafx.event.ActionEvent;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 import java.util.function.Consumer;
 
 /**
  * popup chọn nhạc đã chơi gần đây
  */
-public class SelectRecentlyPlayedMusicController {
+public class SelectRecentlyPlayedMusicController extends PopupController {
     public VBox container;
 
-    public void setup(Consumer<RecentlyPlayedMusic> onClickItemHandler) throws Exception {
-        DbRepository db = DbRepository.getInstance();
+    private DbRepository db;
 
+    public void initialize() throws Exception {
+        db = DbRepository.getInstance();
+    }
+
+    public void setup(Pane popup, Button creator, Consumer<RecentlyPlayedMusic> onClickItemHandler) {
         container.getChildren().clear();
         for (RecentlyPlayedMusic rpm : db.getRecentlyPlayedMusic()) {
             Button item = new Button(rpm.getName());
@@ -26,15 +28,11 @@ public class SelectRecentlyPlayedMusicController {
             item.setPrefWidth(200);
             item.setOnAction(e -> {
                 onClickItemHandler.accept(rpm);
-                closeDialog(e);
+                close(e);
             });
             container.getChildren().add(item);
         }
-    }
 
-    private void closeDialog(ActionEvent event) {
-        Node source = (Node)  event.getSource();
-        Stage stage  = (Stage) source.getScene().getWindow();
-        stage.close();
+        setupPopupPaneAndMoveToButton(popup, creator);
     }
 }

@@ -2,15 +2,13 @@ package com.example.mochamp.controllers;
 
 import com.example.mochamp.DbRepository;
 import com.example.mochamp.models.Playlist;
-import javafx.event.ActionEvent;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -18,12 +16,16 @@ import java.util.function.Consumer;
 /**
  * popup chọn playlist đã lưu
  */
-public class SelectPlaylistController {
+public class SelectPlaylistController extends PopupController{
     public VBox container;
 
-    public void setup(Consumer<Playlist> onClickItemHandler, Consumer<Playlist> onDeletePlaylistHandler) throws Exception {
-        DbRepository db = DbRepository.getInstance();
+    private DbRepository db;
 
+    public void initialize() throws Exception {
+        db = DbRepository.getInstance();
+    }
+
+    public void setup(Pane popup, Button creator, Consumer<Playlist> onClickItemHandler, Consumer<Playlist> onDeletePlaylistHandler) {
         container.getChildren().clear();
         for (Playlist playlist : db.getSavedPlaylists()) {
             HBox hBox = new HBox();
@@ -33,7 +35,7 @@ public class SelectPlaylistController {
             item.setPrefWidth(200);
             item.setOnAction(e -> {
                 onClickItemHandler.accept(playlist);
-                closeDialog(e);
+                close(e);
             });
 
             Button deleteBtn = new Button();
@@ -57,11 +59,7 @@ public class SelectPlaylistController {
             hBox.getChildren().addAll(item, deleteBtn);
             container.getChildren().add(hBox);
         }
-    }
 
-    private void closeDialog(ActionEvent event) {
-        Node source = (Node)  event.getSource();
-        Stage stage  = (Stage) source.getScene().getWindow();
-        stage.close();
+        setupPopupPaneAndMoveToButton(popup, creator);
     }
 }

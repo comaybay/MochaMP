@@ -5,10 +5,10 @@ import com.example.mochamp.DbRepository;
 import com.example.mochamp.MusicPlayerLogic;
 import com.example.mochamp.models.Playlist;
 import javafx.event.ActionEvent;
-import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
+import javafx.scene.layout.Pane;
 
 import java.io.File;
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 /**
  * Dialog để người dùng nhập thông tin cần thiết trước khi lưu playlist
  */
-public class SavePlaylistDialogController {
+public class SavePlaylistDialogController extends PopupController {
     public TextField playlistField;
     public Label errorLabel;
 
@@ -25,13 +25,13 @@ public class SavePlaylistDialogController {
     private MusicPlayerLogic musicPlayerLogic;
     private Runnable onSuccessHandler;
 
+    public void initialize() throws Exception {
+        db = DbRepository.getInstance();
+    }
+
     public void setup(MusicPlayerLogic musicPlayerLogic, Runnable onSuccess) {
         this.musicPlayerLogic = musicPlayerLogic;
         onSuccessHandler = onSuccess;
-    }
-
-    public void initialize() throws Exception {
-        db = DbRepository.getInstance();
     }
 
     public void onSave(ActionEvent event) {
@@ -52,16 +52,11 @@ public class SavePlaylistDialogController {
         Playlist playlist = db.insertPlaylist(new Playlist(-1, playlistName, musicPaths));
         musicPlayerLogic.playMusicInPlaylist(playlist, null);
         onSuccessHandler.run();
-        closeDialog(event);
+        close(event);
     }
 
     public void onCancel(ActionEvent event) {
-        closeDialog(event);
+        close(event);
     }
 
-    private void closeDialog(ActionEvent event) {
-        Node source = (Node)  event.getSource();
-        Stage stage  = (Stage) source.getScene().getWindow();
-        stage.close();
-    }
 }

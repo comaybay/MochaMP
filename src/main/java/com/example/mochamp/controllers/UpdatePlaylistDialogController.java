@@ -6,8 +6,10 @@ import com.example.mochamp.MusicPlayerLogic;
 import com.example.mochamp.models.Playlist;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -17,7 +19,7 @@ import java.util.stream.Collectors;
 /**
  * Dialog để người dùng nhập thông tin cần thiết trước khi cập nhật playlist
  */
-public class UpdatePlaylistDialogController {
+public class UpdatePlaylistDialogController extends PopupController{
     public TextField playlistField;
     public Label errorLabel;
 
@@ -49,7 +51,7 @@ public class UpdatePlaylistDialogController {
         db.updatePlaylist(updatedPlaylist);
         musicPlayerLogic.setPlaylist(updatedPlaylist);
         onSuccessHandler.run();
-        closeDialog(event);
+        close(event);
     }
 
     public void onNewPlaylist(ActionEvent event) {
@@ -64,7 +66,7 @@ public class UpdatePlaylistDialogController {
         Playlist playlist = db.insertPlaylist(new Playlist(-1, playlistName, musicPaths));
         musicPlayerLogic.setPlaylist(playlist);
         onSuccessHandler.run();
-        closeDialog(event);
+        close(event);
     }
 
     private boolean isNameInvalid(String playlistName) {
@@ -82,12 +84,6 @@ public class UpdatePlaylistDialogController {
     }
 
     public void onCancel(ActionEvent event) {
-        closeDialog(event);
-    }
-
-    private void closeDialog(ActionEvent event) {
-        Node source = (Node)  event.getSource();
-        Stage stage  = (Stage) source.getScene().getWindow();
-        stage.close();
+        close(event);
     }
 }
